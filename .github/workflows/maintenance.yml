@@ -1,0 +1,121 @@
+name: maintenance
+
+on:
+  schedule:
+    # Monday 03:17 Asia/Seoul.
+    - cron: "17 18 * * 0"
+  workflow_dispatch:
+    inputs:
+      upgrade_dependencies:
+        description: "Refresh uv.lock and open a pull request"
+        required: false
+        type: boolean
+        default: true
+      run_linkcheck:
+        description: "Run Sphinx external link checks"
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  MAINTENANCE_PYTHON: "3.12"
+
+jobs:
+  dependency-refresh:
+    if: github.event_name == 'schedule' || inputs.upgrade_dependencies == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python
+        run: uv python install "$MAINTENANCE_PYTHON"
+      - name: Refresh uv lockfile
+        run: uv lock --upgrade
+      - name: Install refreshed dependencies
+        run: uv sync --locked --all-groups --python "$MAINTENANCE_PYTHON"
+      - name: Run API-free checks
+        run: |
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python -m compileall examples
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" ruff check examples
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" ty check
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/00_providers/provider_smoke_test.py --dry-run
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/04_evals/evaluate_contract.py
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/04_evals/rag_tool_use_eval.py
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/04_evals/graph_workflow.py
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/04_evals/human_approval_gate.py
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" python examples/05_chatbot/dbos_graph_resume.py --render
+      - name: Build docs
+        env:
+          DOCS_SOURCE_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}/
+          DOCS_SOURCE_BRANCH: main
+          DOCS_SOURCE_DIRECTORY: docs/
+        run: |
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" sphinx-build -n -W --keep-going -b html docs docs/_build/html
+          uv run --all-groups --python "$MAINTENANCE_PYTHON" sphinx-build -W --keep-going -b doctest docs docs/_build/doctest
+      - name: Create dependency refresh pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: maintenance/uv-lock-refresh
+          title: "Refresh Python dependencies"
+          commit-message: "Refresh uv dependencies"
+          body: |
+            Scheduled maintenance refresh for `uv.lock`.
+
+            Checks run in this workflow:
+            - `python -m compileall examples`
+            - `ruff check examples`
+            - `ty check`
+            - API-free example smoke tests
+            - Sphinx HTML and doctest builds
+
+            Provider-backed examples still require local credentials and are not run in scheduled CI.
+
+  python-compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install "${{ matrix.python-version }}"
+      - name: Install locked dependencies
+        run: uv sync --locked --all-groups --python "${{ matrix.python-version }}"
+      - name: Run API-free checks
+        run: |
+          uv run --all-groups --python "${{ matrix.python-version }}" python -m compileall examples
+          uv run --all-groups --python "${{ matrix.python-version }}" ruff check examples
+          uv run --all-groups --python "${{ matrix.python-version }}" ty check
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/00_providers/provider_smoke_test.py --dry-run
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/04_evals/evaluate_contract.py
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/04_evals/rag_tool_use_eval.py
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/04_evals/graph_workflow.py
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/04_evals/human_approval_gate.py
+          uv run --all-groups --python "${{ matrix.python-version }}" python examples/05_chatbot/dbos_graph_resume.py --render
+      - name: Build docs
+        env:
+          DOCS_SOURCE_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}/
+          DOCS_SOURCE_BRANCH: main
+          DOCS_SOURCE_DIRECTORY: docs/
+        run: |
+          uv run --all-groups --python "${{ matrix.python-version }}" sphinx-build -n -W --keep-going -b html docs docs/_build/html
+          uv run --all-groups --python "${{ matrix.python-version }}" sphinx-build -W --keep-going -b doctest docs docs/_build/doctest
+
+  docs-linkcheck:
+    if: github.event_name == 'schedule' || inputs.run_linkcheck == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python
+        run: uv python install "$MAINTENANCE_PYTHON"
+      - name: Install docs dependencies
+        run: uv sync --locked --all-groups --python "$MAINTENANCE_PYTHON"
+      - name: Check external documentation links
+        run: uv run --all-groups --python "$MAINTENANCE_PYTHON" sphinx-build -W --keep-going -b linkcheck docs docs/_build/linkcheck

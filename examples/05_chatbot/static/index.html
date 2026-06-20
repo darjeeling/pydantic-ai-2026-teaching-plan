@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pydantic AI Course Chatbot</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 0;
+        background: #f7f7f5;
+        color: #202124;
+      }
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+      header {
+        padding: 24px 16px 12px;
+        border-bottom: 1px solid #ddd;
+      }
+      h1 {
+        font-size: 24px;
+        margin: 0 0 6px;
+      }
+      p {
+        margin: 0;
+        color: #5f6368;
+      }
+      #messages {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .message {
+        max-width: 76%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        white-space: pre-wrap;
+      }
+      .user {
+        align-self: flex-end;
+        background: #e9f2ff;
+      }
+      form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 16px;
+        border-top: 1px solid #ddd;
+        background: #fff;
+      }
+      input,
+      button {
+        font: inherit;
+        border-radius: 8px;
+      }
+      input {
+        padding: 12px;
+        border: 1px solid #bbb;
+      }
+      button {
+        border: 0;
+        padding: 0 18px;
+        background: #1f6feb;
+        color: white;
+        cursor: pointer;
+      }
+      button:disabled,
+      input:disabled {
+        cursor: not-allowed;
+        opacity: 0.62;
+      }
+      #status {
+        min-height: 20px;
+        padding: 0 16px 8px;
+        color: #5f6368;
+      }
+      #status.error {
+        color: #b42318;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Pydantic AI Course Chatbot</h1>
+        <p>FastAPI, Pydantic AI, SQLite message history</p>
+      </header>
+      <section id="messages"></section>
+      <div id="status" aria-live="polite"></div>
+      <form id="chat-form">
+        <input id="message-input" name="message" autocomplete="off" placeholder="질문을 입력하세요" />
+        <button type="submit">Send</button>
+      </form>
+    </main>
+    <script>
+      const messagesEl = document.querySelector("#messages");
+      const form = document.querySelector("#chat-form");
+      const input = document.querySelector("#message-input");
+      const button = form.querySelector("button");
+      const statusEl = document.querySelector("#status");
+      let pendingRequestId = null;
+
+      function render(messages) {
+        messagesEl.innerHTML = "";
+        for (const message of messages) {
+          const div = document.createElement("div");
+          div.className = `message ${message.role === "user" ? "user" : "model"}`;
+          div.textContent = message.content;
+          messagesEl.appendChild(div);
+        }
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+
+      async function loadMessages() {
+        const response = await fetch("/messages");
+        render(await response.json());
+      }
+
+      function setPending(isPending) {
+        input.disabled = isPending;
+        button.disabled = isPending;
+        button.textContent = isPending ? "Sending" : "Send";
+        if (isPending) {
+          statusEl.className = "";
+          statusEl.textContent = "응답을 기다리는 중입니다.";
+        }
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (pendingRequestId) return;
+
+        const message = input.value.trim();
+        if (!message) return;
+        input.value = "";
+
+        pendingRequestId = crypto.randomUUID();
+        setPending(true);
+
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_id: pendingRequestId, message }),
+          });
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail ?? "Request failed");
+          }
+          const data = await response.json();
+          render(data.messages);
+          statusEl.className = "";
+          statusEl.textContent = "";
+        } catch (error) {
+          statusEl.className = "error";
+          statusEl.textContent = error.message;
+          input.value = message;
+        } finally {
+          pendingRequestId = null;
+          setPending(false);
+        }
+      });
+
+      loadMessages();
+    </script>
+  </body>
+</html>

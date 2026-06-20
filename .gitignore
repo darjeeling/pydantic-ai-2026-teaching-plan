@@ -1,0 +1,16 @@
+.env
+.DS_Store
+.logfire/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ty/
+docs/_build/
+logs/
+*.log
+*.sqlite
+*.sqlite3
+postgres-data/

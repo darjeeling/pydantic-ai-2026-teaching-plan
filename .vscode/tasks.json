@@ -1,0 +1,33 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "uv: sync",
+      "type": "shell",
+      "command": "uv sync",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "ty: check",
+      "type": "shell",
+      "command": "uv run ty check",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "ruff: check",
+      "type": "shell",
+      "command": "uv run ruff check examples",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "provider: dry-run",
+      "type": "shell",
+      "command": "uv run python examples/00_providers/provider_smoke_test.py --dry-run",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

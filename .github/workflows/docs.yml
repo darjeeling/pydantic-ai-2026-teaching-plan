@@ -1,0 +1,58 @@
+name: docs
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  CI_PYTHON: "3.12"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python
+        run: uv python install "$CI_PYTHON"
+      - name: Install dependencies
+        run: uv sync --locked --group docs --python "$CI_PYTHON"
+      - name: Build Sphinx site
+        env:
+          DOCS_SOURCE_REPOSITORY: ${{ github.server_url }}/${{ github.repository }}/
+          DOCS_SOURCE_BRANCH: main
+          DOCS_SOURCE_DIRECTORY: docs/
+          SPHINX_HTML_BASEURL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+        run: uv run --group docs --python "$CI_PYTHON" sphinx-build -n -W --keep-going -b html docs docs/_build/html
+      - name: Prepare GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        run: touch docs/_build/html/.nojekyll
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

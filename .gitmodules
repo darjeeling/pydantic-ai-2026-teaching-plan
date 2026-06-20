@@ -1,0 +1,11 @@
+[submodule "references/monty"]
+	path = references/monty
+	url = https://github.com/pydantic/monty.git
+
+[submodule "references/pydantic-ai"]
+	path = references/pydantic-ai
+	url = https://github.com/pydantic/pydantic-ai.git
+
+[submodule "references/pydantic-ai-harness"]
+	path = references/pydantic-ai-harness
+	url = https://github.com/pydantic/pydantic-ai-harness.git

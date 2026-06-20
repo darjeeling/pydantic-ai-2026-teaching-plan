@@ -1,0 +1,51 @@
+[project]
+name = "pydantic-ai-2026-teaching-plan"
+version = "0.1.0"
+description = "Korean teaching materials and examples for Pydantic AI, RAG, Monty, evals, graph, multi-agent workflows, DBOS, and FastAPI chatbots."
+requires-python = ">=3.11"
+dependencies = [
+    "asyncpg",
+    "dbos",
+    "fastapi[standard]",
+    "httpx",
+    "logfire",
+    "openai",
+    "pydantic",
+    "pydantic-ai[dbos]",
+    "pydantic-ai-harness[codemode]",
+    "pydantic-evals",
+    "python-dotenv",
+    "uvicorn[standard]",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "ty>=0.0.43",
+]
+docs = [
+    "furo>=2024.8.6",
+    "myst-parser>=4.0.0",
+    "sphinx>=8.2.0",
+    "sphinx-copybutton>=0.5.2",
+    "sphinxcontrib-mermaid>=1.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ty.environment]
+python = ".venv"
+python-version = "3.11"
+
+[tool.ty.src]
+include = ["examples"]
+exclude = ["references", "postgres-data"]
+
+[tool.ty.terminal]
+output-format = "concise"

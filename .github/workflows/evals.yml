@@ -1,0 +1,56 @@
+name: evals
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      eval_models:
+        description: "Comma-separated model candidates for model-switch evals"
+        required: false
+        default: "openai:gpt-5.1,openai:gpt-5.2"
+      repeat:
+        description: "Repeat count per eval case"
+        required: false
+        default: "1"
+
+env:
+  CI_PYTHON: "3.12"
+
+jobs:
+  deterministic-evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python
+        run: uv python install "$CI_PYTHON"
+      - name: Install dependencies
+        run: uv sync --locked --python "$CI_PYTHON"
+      - name: Run deterministic evals
+        run: uv run --python "$CI_PYTHON" python examples/04_evals/evaluate_contract.py
+      - name: Compile examples
+        run: uv run --python "$CI_PYTHON" python -m compileall examples
+      - name: Lint examples
+        run: uv run --python "$CI_PYTHON" ruff check examples
+
+  model-switch-evals:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Set up Python
+        run: uv python install "$CI_PYTHON"
+      - name: Install dependencies
+        run: uv sync --locked --python "$CI_PYTHON"
+      - name: Run model candidate evals
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EVAL_MODELS: ${{ inputs.eval_models }}
+          EVAL_REPEAT: ${{ inputs.repeat }}
+          EVAL_MAX_CONCURRENCY: "2"
+          EVAL_MIN_ASSERTION_RATE: "0.8"
+        run: uv run --python "$CI_PYTHON" python examples/04_evals/compare_models.py
