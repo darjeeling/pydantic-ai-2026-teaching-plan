@@ -15,7 +15,8 @@
 5. `LessonAnswer`에 `next_action: str` 필드를 추가한다.
 6. 안전한 로컬 API 호출 로그에서 실제 provider 호출이 남았는지 확인한다.
 7. Logfire trace에서 tool call이 실제로 발생했는지 확인한다.
-8. 질문을 다음처럼 바꿔 실행한다.
+8. VS Code Debugger 또는 `breakpoint()`로 `read_lesson` 안에서 `lesson_id`와 `ctx.deps.lessons`를 확인한다.
+9. 질문을 다음처럼 바꿔 실행한다.
 
 ```text
 Monty를 배우려면 어떤 회차를 보면 되고, 다음에는 무엇을 해야 하나요?
@@ -36,3 +37,4 @@ tail -n 30 logs/api-calls.log
 - `logs/httpx-raw-api.log`에서 raw request/response body를 확인했다.
 - `logs/api-calls.log`에서 `tool_agent`의 `agent.run start/done` 로그를 확인했다.
 - Logfire를 사용할 수 있는 환경이면 agent run과 tool call trace를 확인했다.
+- debugger나 `pdb`에서 tool 인자와 deps 값을 직접 확인했다.

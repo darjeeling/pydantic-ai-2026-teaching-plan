@@ -61,6 +61,7 @@ Pydantic AI는 Python type hint와 Pydantic validation을 agent의 중심 개념
 - Logfire hosted UI에서 trace를 보려면 `uv run logfire auth` 후 `uv run logfire projects use <project>`를 실행해 `.logfire` 설정을 만든다. 설정이 없어도 예제는 `send_to_logfire="if-token-present"` 때문에 실행 가능하다.
 - 첫 API 호출은 raw HTTPX 예제로 `logs/httpx-raw-api.log`에 request/response body를 남겨 API 모양을 확인한다.
 - 이후 Pydantic AI 예제는 안전한 breadcrumb만 `logs/api-calls.log`에 남긴다. Logfire UI를 못 쓰는 교육장에서도 이 파일로 "실제 provider 호출이 나갔는가"를 확인한다.
+- VS Code Debugger 또는 `breakpoint()`/`pdb`로 `agent.run_sync`, tool 함수, structured output 직전의 변수를 확인할 수 있어야 한다.
 - 실행 확인:
 
 ```bash
@@ -83,12 +84,13 @@ API 키가 없는 수강생이 있으면 강사는 실행 결과를 화면에서
 | 22-32분 | 최소 Agent | raw HTTP 호출을 Pydantic AI `Agent.run_sync`로 감싸는 의미 이해 | `hello_agent.py` 실행 |
 | 32-40분 | 안전한 로컬 API 로그 | payload 없는 breadcrumb로 줄이는 이유 이해 | `logs/api-calls.log` 확인 |
 | 40-50분 | Logfire 관측 | agent run, model request, usage, trace 개념 이해 | `logfire_agent.py` 읽기 |
-| 50-58분 | Instructions | 고정 prompt와 런타임 prompt 구분 | instructions 수정 후 결과 비교 |
-| 58-65분 | Tool calling | tool schema, docstring, 타입 힌트 이해 | `read_lesson` tool 읽기 |
-| 65-70분 | 짧은 휴식/질문 | 모호한 개념 정리 | 질문 |
-| 70-90분 | Deps와 RunContext | 전역 상태 대신 요청 단위 의존성 주입 이해 | lesson catalog를 deps로 바꿔보기 |
-| 90-105분 | Structured output | Pydantic 모델이 응답 계약이 되는 방식 이해 | `LessonAnswer` 필드 추가 |
-| 105-118분 | 실습 리뷰 | 흔한 실패를 디버깅한다 | 결과 공유 |
+| 50-62분 | 로컬 디버깅 | VS Code Debugger와 `breakpoint()`로 변수와 tool 인자 확인 | breakpoint 걸고 실행 |
+| 62-68분 | Instructions | 고정 prompt와 런타임 prompt 구분 | instructions 수정 후 결과 비교 |
+| 68-75분 | Tool calling | tool schema, docstring, 타입 힌트 이해 | `read_lesson` tool 읽기 |
+| 75-80분 | 짧은 휴식/질문 | 모호한 개념 정리 | 질문 |
+| 80-95분 | Deps와 RunContext | 전역 상태 대신 요청 단위 의존성 주입 이해 | lesson catalog를 deps로 바꿔보기 |
+| 95-108분 | Structured output | Pydantic 모델이 응답 계약이 되는 방식 이해 | `LessonAnswer` 필드 추가 |
+| 108-118분 | 디버깅 실습 리뷰 | 흔한 실패를 로그, trace, debugger로 분리한다 | 결과 공유 |
 | 118-120분 | 다음 회차 연결 | tool에서 RAG로 넘어갈 이유 만들기 | 한 줄 회고 |
 
 ## 도입 이야기
@@ -145,6 +147,23 @@ LLM 애플리케이션은 느리고, 비싸고, 비결정적이다. print로 최
 수업에서는 API 호출 확인을 두 단계로 나눈다. 첫 번째는 raw HTTPX 호출이다. request와 response를 파일에 거의 그대로 남겨 "LLM 호출도 결국 HTTP API 호출"이라는 사실을 확인한다. 두 번째는 안전한 breadcrumb 로그다. raw log는 설명에는 좋지만 공유/운영에는 위험하므로, 이후 예제는 payload 없이 호출 시작/종료, model string, usage 정도만 남긴다.
 
 Logfire trace는 그 다음 단계다. 파일 로그는 "호출이 나갔는가"를 확인하고, Logfire는 agent run, model request, tool call, validation을 span으로 보여 준다.
+
+### 디버깅 도구의 역할 구분
+
+1회차에서 디버깅 도구를 한꺼번에 많이 소개하면 수강생이 헷갈린다. 그래서 각 도구의 역할을 분리해서 설명한다.
+
+| 도구 | 확인하는 것 | 언제 쓰는가 |
+| --- | --- | --- |
+| Raw HTTPX 로그 | 실제 HTTP request/response body | "LLM 호출도 HTTP API 호출"이라는 감각을 만들 때 |
+| `logs/api-calls.log` | 호출 시작/종료, model string, usage, HTTP status | Logfire 없이 provider 호출 여부를 확인할 때 |
+| Logfire trace | agent run, model request, tool call, validation 흐름 | 실행 경로와 tool 호출 여부를 확인할 때 |
+| VS Code Debugger | Python 변수, 분기, call stack | 코드를 한 줄씩 따라가며 원인을 찾을 때 |
+| `breakpoint()`/`pdb` | 터미널에서 변수와 stack 확인 | VS Code를 못 쓰거나 빠르게 한 지점만 멈출 때 |
+| traceback | 예외가 발생한 파일, 줄, 원인 | validation error, env var 누락, auth error를 읽을 때 |
+
+강사가 강조할 문장:
+
+"로그와 trace는 실행이 지나간 증거를 봅니다. debugger와 `pdb`는 실행 중인 Python 상태를 멈춰서 봅니다. 답변이 이상하면 먼저 trace로 tool이 호출됐는지 보고, tool 안의 값이 이상하면 debugger로 `ctx.deps`와 인자를 봅니다."
 
 ### 1단계: raw HTTPX 전체 로그
 
@@ -238,6 +257,59 @@ logfire.instrument_pydantic_ai()
 초반에 Logfire를 넣는 이유:
 
 "agent를 먼저 만들고 나중에 관측을 붙이면, 수강생은 최종 답변만 보는 습관이 생깁니다. 첫 시간부터 trace를 보면 tool call과 model call을 실행 흐름으로 이해하게 됩니다. 이후 RAG, CodeMode, multi-agent, DBOS를 배울 때도 trace를 기준으로 디버깅할 수 있습니다."
+
+### 로컬 디버깅: VS Code Debugger, breakpoint, pdb
+
+Logfire와 파일 로그가 "agent가 무엇을 했는가"를 보여 준다면, 로컬 debugger는 "지금 Python 코드 안에 어떤 값이 들어 있는가"를 보여 준다. 1회차에서는 복잡한 디버깅 기법보다 다음 세 지점을 멈춰 보는 정도면 충분하다.
+
+추천 breakpoint:
+
+- `examples/01_basics/hello_agent.py`: `agent.run_sync(prompt)` 직전과 직후
+- `examples/01_basics/tool_agent.py`: `read_lesson(ctx, lesson_id)` 첫 줄
+- `examples/01_basics/tool_agent.py`: `answer = cast(LessonAnswer, result.output)` 직후
+
+VS Code에서는 `.vscode/launch.json`에 있는 `01 hello_agent`, `01 tool_agent`, `01 raw HTTPX log` 구성을 선택해서 실행한다. 수강생에게는 다음 순서로 보여준다.
+
+1. `01 tool_agent`를 선택한다.
+2. `read_lesson` 함수 안에 breakpoint를 건다.
+3. Debug 실행 후 Variables 패널에서 `lesson_id`, `ctx.deps.lessons`를 확인한다.
+4. Call Stack에서 agent 실행 중 tool 함수로 들어온 흐름을 확인한다.
+5. Continue로 끝까지 실행하고 `result.output`을 확인한다.
+
+터미널만 쓰는 환경에서는 `breakpoint()`를 임시로 넣는다.
+
+```python
+@agent.tool
+async def read_lesson(ctx: RunContext[CourseDeps], lesson_id: str) -> str:
+    breakpoint()
+    return ctx.deps.lessons.get(lesson_id, f"Unknown lesson id: {lesson_id}")
+```
+
+실행:
+
+```bash
+uv run python examples/01_basics/tool_agent.py
+```
+
+자주 쓰는 `pdb` 명령은 이 정도만 다룬다.
+
+| 명령 | 의미 |
+| --- | --- |
+| `p lesson_id` | 변수 출력 |
+| `p ctx.deps.lessons` | deps 안의 catalog 확인 |
+| `where` | 현재 call stack 확인 |
+| `n` | 다음 줄 실행 |
+| `s` | 함수 안으로 들어가기 |
+| `c` | 다음 breakpoint까지 계속 실행 |
+| `q` | 디버깅 종료 |
+
+주의할 점:
+
+- 수업 자료에 `breakpoint()`를 남긴 채 커밋하지 않는다.
+- API key나 prompt가 Variables 패널에 보일 수 있으므로 화면 공유 전에 확인한다.
+- provider 호출이 오래 걸릴 수 있으니, breakpoint는 모델 호출 직전/직후와 tool 내부처럼 의미 있는 곳에만 건다.
+
+traceback 읽기도 1회차에서 짧게 다룬다. 에러가 나면 맨 아래 예외 이름과 메시지를 먼저 보고, 그 위의 내 코드 파일 경로를 찾는다. 예를 들어 `ValidationError`면 `LessonAnswer` schema와 모델 출력이 맞지 않는 것이고, `RuntimeError: OPENAI_API_KEY is required`면 `.env`와 환경변수를 먼저 본다. 디버깅의 목표는 모든 stack frame을 이해하는 것이 아니라 "내가 고칠 파일과 줄"을 찾는 것이다.
 
 ### Instructions
 

@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "01 hello_agent",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01_basics/hello_agent.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "01 tool_agent",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01_basics/tool_agent.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    },
+    {
+      "name": "01 raw HTTPX log",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01_basics/httpx_raw_api_log.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
+    }
+  ]
+}
