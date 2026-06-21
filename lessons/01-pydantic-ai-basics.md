@@ -375,6 +375,30 @@ tool은 모델이 부를 수 있는 우리 쪽 애플리케이션 함수다. Pyd
 - `@agent.tool`: 첫 인자로 `RunContext`를 받아 deps, usage 같은 실행 문맥을 읽는다.
 - `@agent.tool_plain`: context가 필요 없는 순수 함수에 쓴다.
 
+### raw 함수 호출 한 바퀴(loop) 보기
+
+"모델이 함수를 부른다"는 게 추상적으로 들리면, framework 없이 HTTP로 직접 한 바퀴를 돌려 보면 단번에 와닿는다. raw HTTPX 예제(`httpx_raw_api_log.py`)는 일부러 tool 없이 일반 완성만 보여 줬다면, `examples/01_basics/raw_function_call.py`는 함수 호출의 실체를 wire 레벨에서 보여 준다. 같은 `list_lesson_ids` tool로 두 가지 API 표면을 나란히 돌린다.
+
+- Part A: Chat Completions의 `tools` / `tool_calls`
+- Part B: Responses API의 `function_call` / `function_call_output`
+
+```bash
+uv run python examples/01_basics/raw_function_call.py
+tail -n 20 logs/httpx-raw-function-call.log
+```
+
+두 방식 모두 한 바퀴는 똑같다.
+
+1. tool 정의를 모델에게 보낸다.
+2. 모델은 코드를 실행하지 않고 "이 함수를 이런 인자로 불러 줘"라고 요청한다(`tool_calls` 또는 `function_call`).
+3. 우리 코드가 실제 함수를 실행한다.
+4. 그 결과를 다시 모델에게 넣어 2차 호출을 한다.
+5. 모델이 결과를 바탕으로 최종 답을 만든다.
+
+이렇게 말한다.
+
+"앞에서 'agent는 tool을 loop로 부른다'고 했죠. 이게 그 loop의 맨 얼굴이에요. 모델이 직접 `list_lesson_ids()`를 실행하는 게 아니라, '불러 달라'고 JSON으로 요청하고 우리가 실행해서 결과를 돌려줍니다. Pydantic AI의 `@agent.tool`은 이 왕복을 타입과 검증으로 감싼 것뿐이에요."
+
 ### Deps와 RunContext
 
 `RunContext[CourseDeps]`는 tool이 현재 실행의 dependency에 닿는 통로다.

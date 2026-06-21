@@ -27,6 +27,15 @@
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env",
       "justMyCode": true
+    },
+    {
+      "name": "01 raw function call",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01_basics/raw_function_call.py",
+      "console": "integratedTerminal",
+      "envFile": "${workspaceFolder}/.env",
+      "justMyCode": true
     }
   ]
 }
