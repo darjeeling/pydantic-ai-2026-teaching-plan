@@ -22,6 +22,8 @@ exclude_patterns = [
     "_build",
     "Thumbs.db",
     ".DS_Store",
+    # Internal working note, not part of the published site.
+    "tone-rewrite-plan.md",
 ]
 
 templates_path = ["_templates"]
