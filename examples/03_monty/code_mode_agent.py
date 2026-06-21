@@ -21,7 +21,7 @@ LESSONS: dict[str, Lesson] = {
     "05": {"title": "DBOS and FastAPI chatbot", "minutes": 150},
 }
 
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 
 agent = Agent(
     model,

@@ -17,7 +17,7 @@ class Deps:
     pool: asyncpg.Pool
 
 
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 
 agent = Agent(
     model,
@@ -41,7 +41,7 @@ async def retrieve(ctx: RunContext[Deps], query: str) -> str:
         """
         SELECT source, title, content
         FROM doc_chunks
-        ORDER BY embedding <-> $1::vector
+        ORDER BY embedding <=> $1::vector
         LIMIT 5
         """,
         vector,

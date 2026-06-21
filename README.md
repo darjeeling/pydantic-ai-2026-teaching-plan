@@ -48,7 +48,7 @@ uv sync
 cp .env.example .env
 ```
 
-`.env`에 사용할 provider credential을 설정합니다. 기본값이 OpenAI라서 `OPENAI_API_KEY`와 `COURSE_MODEL=openai:gpt-5.2`만 넣으면 바로 시작할 수 있습니다. 기존 예제와의 호환을 위해 `OPENAI_MODEL`도 fallback으로 남겨 두었습니다. Pydantic AI가 `openai:` prefix에 대해 v2 동작 변경 경고를 띄우면, 현재 Chat Completions 동작을 고정하려면 `COURSE_MODEL=openai-chat:gpt-5.2`를, Responses API를 명시하려면 `COURSE_MODEL=openai-responses:gpt-5.2`를 씁니다.
+`.env`에 사용할 provider credential을 설정합니다. 기본값이 OpenAI라서 `OPENAI_API_KEY`와 `COURSE_MODEL=openai:gpt-5.5`만 넣으면 바로 시작할 수 있습니다. 기존 예제와의 호환을 위해 `OPENAI_MODEL`도 fallback으로 남겨 두었습니다. Pydantic AI가 `openai:` prefix에 대해 v2 동작 변경 경고를 띄우면, 현재 Chat Completions 동작을 고정하려면 `COURSE_MODEL=openai-chat:gpt-5.5`를, Responses API를 명시하려면 `COURSE_MODEL=openai-responses:gpt-5.5`를 씁니다.
 
 VS Code 실습은 `.vscode/`의 workspace 설정을 따릅니다. 공통으로 권장하는 확장은 `astral-sh.ty`, `charliermarsh.ruff`, `ms-python.python`이고, Windows host에서는 WSL 연결용 `ms-vscode-remote.remote-wsl`도 필요합니다. AI assistant는 실습 도구로 쓰지 않습니다. 자동완성, hover, go-to-definition은 `ty` language server로 확인합니다.
 

@@ -26,7 +26,7 @@ load_dotenv()
 
 THIS_DIR = Path(__file__).parent
 DB_PATH = THIS_DIR / "chat_messages.sqlite"
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 AGENT_TIMEOUT_SECONDS = float(os.getenv("AGENT_TIMEOUT_SECONDS", "45"))
 
 agent = Agent(

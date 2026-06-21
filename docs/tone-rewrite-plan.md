@@ -10,7 +10,7 @@
 
 ## 사실관계 (이미 양호, 손대지 않음)
 
-- 모델명 일관적: `openai:gpt-5.2`, `openrouter:anthropic/claude-sonnet-4.6`, `google:gemini-3-pro-preview`, `bedrock:anthropic.claude-sonnet-4-5-...`.
+- 모델명 일관적: `openai:gpt-5.5`, `openrouter:anthropic/claude-sonnet-4.6`, `google:gemini-3.1-pro-preview`, `bedrock:anthropic.claude-sonnet-4-5-...`.
 - lessons가 참조하는 examples 코드/함수/클래스 전부 실재.
 - lessons ↔ slides ↔ exercises ↔ README 회차 매핑 정확.
 

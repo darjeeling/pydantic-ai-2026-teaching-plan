@@ -36,7 +36,7 @@ class LessonAnswer(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
 
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 
 agent = Agent(
     model,

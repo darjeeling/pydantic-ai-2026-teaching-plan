@@ -105,8 +105,8 @@ provider 이름만 보고 고르면 안 된다.
 ```bash
 COURSE_MODEL=openrouter:anthropic/claude-sonnet-4.6
 COURSE_MODEL=bedrock:anthropic.claude-sonnet-4-5-20250929-v1:0
-COURSE_MODEL=google:gemini-3-pro-preview
-COURSE_MODEL=google-cloud:gemini-3-pro-preview
+COURSE_MODEL=google:gemini-3.1-pro-preview
+COURSE_MODEL=google-cloud:gemini-3.1-pro-preview
 ```
 
 ## Smoke Test
@@ -114,7 +114,7 @@ COURSE_MODEL=google-cloud:gemini-3-pro-preview
 ```bash
 uv run python examples/00_providers/provider_smoke_test.py --dry-run
 
-COURSE_MODEL=google:gemini-3-pro-preview \
+COURSE_MODEL=google:gemini-3.1-pro-preview \
   uv run python examples/00_providers/provider_smoke_test.py
 ```
 

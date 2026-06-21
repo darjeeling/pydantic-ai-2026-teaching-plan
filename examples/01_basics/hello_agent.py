@@ -22,7 +22,7 @@ logfire.instrument_pydantic_ai()
 
 
 def main() -> None:
-    model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+    model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
     prompt = "Pydantic AI를 처음 배우는 사람에게 한 문단으로 설명해줘."
     agent = Agent(
         model,

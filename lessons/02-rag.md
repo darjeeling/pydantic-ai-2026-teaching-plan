@@ -62,6 +62,8 @@ uv run python examples/02_rag/load_docs.py
 uv run python examples/02_rag/rag_agent.py "RAG는 언제 쓰나요?"
 ```
 
+예제는 `POSTGRES_DSN`이 없으면 `postgresql://postgres:postgres@localhost:54320/pydantic_ai_course`를 기본값으로 쓴다. 위 `docker compose`가 포트 `54320`으로 pgvector를 띄우므로, 기본값 그대로면 별도 설정 없이 연결된다. 포트나 DB를 바꿨다면 `POSTGRES_DSN`을 직접 맞춘다.
+
 Docker가 어려운 환경이면 강사는 `schema.sql`, `load_docs.py`, `rag_agent.py`를 코드 중심으로 설명하고, SQL 결과는 미리 캡처해서 보여 준다.
 
 OpenAI embedding API를 쓰기 어려운 환경이면 Ollama나 SentenceTransformers 기반 로컬 embedding으로 대체할 수 있다. 이때도 답변 생성 agent는 기본적으로 `COURSE_MODEL`을 쓰므로, "embedding만 로컬"인지 "답변 모델까지 로컬"인지 구분해서 설명한다. 이 수업의 예제는 embedding provider만 바꿔 끼우는 구조다.
@@ -108,6 +110,8 @@ chunk는 검색과 답변의 기본 단위다. chunk가 너무 크면 검색은 
 - source path 또는 URL을 저장한다.
 - 한 chunk가 하나의 의미 단위를 담게 한다.
 - 코드/표/절차 문서는 문단 기준이 항상 최선은 아니다.
+
+참고로 현재 예제(`load_docs.py`)는 title을 컬럼으로 저장은 하지만 embedding은 content만으로 만든다. 그래서 본문에 없고 제목에만 있는 단어로는 검색이 약할 수 있다. 운영에서는 title을 content 앞에 붙여 함께 embedding하거나, 문서 metadata를 prefix로 넣는 방식을 검토한다.
 
 수강생 질문:
 
@@ -164,7 +168,7 @@ RAG 실패는 세 단계로 나눠 본다.
 
 ### Embedding model 선택
 
-Embedding model은 답변 생성 모델과 별개다. `gpt-5.2` 같은 chat model이 답변을 만들더라도, 문서와 질문을 vector로 바꾸는 embedding model은 OpenAI API일 수도 있고 로컬 모델일 수도 있다.
+Embedding model은 답변 생성 모델과 별개다. `gpt-5.5` 같은 chat model이 답변을 만들더라도, 문서와 질문을 vector로 바꾸는 embedding model은 OpenAI API일 수도 있고 로컬 모델일 수도 있다.
 
 수업에서는 세 가지 선택지를 보여 준다.
 
@@ -249,11 +253,23 @@ embedding vector(1536) NOT NULL
 SQL 검색은 다음처럼 동작한다.
 
 ```sql
-ORDER BY embedding <-> $1::vector
+ORDER BY embedding <=> $1::vector
 LIMIT 5
 ```
 
 이 쿼리는 질문 embedding과 가까운 chunk를 찾는다.
+
+여기서 거리 연산자를 한 번 짚고 넘어간다. pgvector는 거리 종류마다 다른 연산자를 쓴다.
+
+- `<->`: L2(Euclidean) 거리
+- `<=>`: cosine 거리
+- `<#>`: 음수 inner product
+
+중요한 건 쿼리의 연산자가 index의 opclass와 맞아야 한다는 점이다. `schema.sql`의 index는 `hnsw (embedding vector_cosine_ops)`로 cosine 기준이라, 쿼리도 cosine 연산자 `<=>`를 써야 index가 쓰인다. cosine index를 만들어 놓고 `<->`로 검색하면 index를 못 타서 full scan이 되고, OpenAI처럼 정규화된 embedding이 아니면 순위까지 달라질 수 있다. "어떤 거리로 색인했는지"와 "어떤 거리로 검색하는지"는 항상 같이 봐야 한다.
+
+이렇게 말한다.
+
+"vector 검색이 느리거나 결과가 이상하면, index opclass와 쿼리 연산자가 같은 거리인지부터 확인하세요. cosine으로 색인했으면 cosine으로 검색해야 합니다."
 
 강사가 설명할 tradeoff:
 

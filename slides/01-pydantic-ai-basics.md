@@ -41,7 +41,7 @@ logfire.instrument_pydantic_ai()
 ```python
 from pydantic_ai import Agent
 
-agent = Agent("openai:gpt-5.2", instructions="간결하게 답하세요.")
+agent = Agent("openai:gpt-5.5", instructions="간결하게 답하세요.")
 result = agent.run_sync("Pydantic AI를 한 문장으로 설명해줘.")
 print(result.output)
 ```

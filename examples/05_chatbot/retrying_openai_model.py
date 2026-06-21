@@ -40,7 +40,7 @@ def create_retrying_http_client() -> httpx.AsyncClient:
 
 def build_agent() -> Agent[None, str]:
     client = create_retrying_http_client()
-    model = OpenAIChatModel("gpt-5.2", provider=OpenAIProvider(http_client=client))
+    model = OpenAIChatModel("gpt-5.5", provider=OpenAIProvider(http_client=client))
     return Agent(
         model,
         instructions=(

@@ -57,7 +57,7 @@ Pydantic AI는 Python type hint와 Pydantic validation을 agent의 중심에 둔
 ## 수업 전 준비
 
 - 0회차 provider smoke test가 끝났고 `.env`에 `COURSE_MODEL`이 들어 있어야 한다.
-- OpenAI만 쓰는 환경이면 `COURSE_MODEL=openai:gpt-5.2`와 `OPENAI_API_KEY`를 설정한다. 경고를 피하고 싶으면 `openai-chat:gpt-5.2` 또는 `openai-responses:gpt-5.2`로 바꾼다.
+- OpenAI만 쓰는 환경이면 `COURSE_MODEL=openai:gpt-5.5`와 `OPENAI_API_KEY`를 설정한다. 경고를 피하고 싶으면 `openai-chat:gpt-5.5` 또는 `openai-responses:gpt-5.5`로 바꾼다.
 - Logfire hosted UI에서 trace를 보려면 `uv run logfire auth` 후 `uv run logfire projects use <project>`로 `.logfire` 설정을 만든다. 설정이 없어도 예제는 `send_to_logfire="if-token-present"` 덕분에 그냥 돈다.
 - 첫 API 호출은 raw HTTPX 예제로 돌려서, request/response body가 실제 파일에 어떻게 남는지 본다.
 - 그 다음부터 Pydantic AI 예제는 안전한 breadcrumb만 `logs/api-calls.log`에 남긴다. Logfire UI를 못 쓰는 교육장에서도 이 파일로 "실제 provider 호출이 나갔는가"를 확인할 수 있다.
@@ -121,10 +121,11 @@ typed application result
 
 수업에서는 이렇게 짚어 준다.
 
-- `Agent("openai:gpt-5.2")`나 `Agent("openrouter:anthropic/claude-sonnet-4.6")`처럼 어떤 provider/model을 쓸지 정한다.
+- `Agent("openai:gpt-5.5")`나 `Agent("openrouter:anthropic/claude-sonnet-4.6")`처럼 어떤 provider/model을 쓸지 정한다.
 - agent는 보통 전역 객체로 한 번 만들어 두고 재사용한다.
 - 요청마다 달라지는 값은 생성자에 넣지 말고 `run(..., deps=...)`로 넘긴다.
 - agent를 stateless에 가깝게 설계해야 테스트와 운영이 쉬워진다.
+- 실행은 `agent.run_sync(...)`(동기)와 `await agent.run(...)`(비동기) 두 가지다. 간단한 스크립트나 디버깅에는 `run_sync`, FastAPI 같은 async 서버에서는 `run`을 쓴다. 그래서 예제도 단독 실행 스크립트(`hello_agent.py`)는 `run_sync`, deps를 받아 돌리는 `tool_agent.py`는 `await agent.run(...)`을 쓴다.
 
 수강생에게 던질 질문:
 
@@ -388,6 +389,8 @@ async def read_lesson(ctx: RunContext[CourseDeps], lesson_id: str) -> str:
 - schema가 너무 복잡하면 모델이 자주 실패한다.
 - `confidence` 같은 숫자는 모델의 주관적 추정이라, 실제 확률처럼 쓰면 안 된다.
 - 사용자에게 보여줄 텍스트와 내부 control field는 구분해야 한다.
+
+예제에서 `cast(LessonAnswer, result.output)`을 보게 된다. `output_type`을 지정하면 `result.output`은 런타임에 이미 `LessonAnswer` 값이지만, 타입 체커는 종종 이를 `Any`로 본다. `cast`는 런타임에 아무 일도 하지 않고, 타입 체커와 IDE 자동완성에게 "이건 `LessonAnswer`다"라고 알려 주는 표시일 뿐이다.
 
 ## 라이브코딩 1: 최소 Agent
 

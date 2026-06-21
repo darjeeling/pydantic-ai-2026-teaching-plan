@@ -34,7 +34,7 @@ def configure_observability() -> None:
 def main() -> None:
     configure_observability()
 
-    model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+    model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
     prompt = "Logfire를 왜 agent 수업 초반에 붙이나요?"
     agent = Agent(
         model,

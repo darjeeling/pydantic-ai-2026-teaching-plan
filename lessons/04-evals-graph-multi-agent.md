@@ -268,7 +268,7 @@ uv run python examples/04_evals/rag_tool_use_eval.py
 
 ## 모델 전환을 Eval로 판단하기
 
-모델 변경은 단순 설정 변경이 아니라 dependency upgrade다. `openai:gpt-5.1`에서 `openai:gpt-5.2`로 올리거나, 비싼 모델을 저렴한 모델로 낮추거나, provider를 바꿀 때 "응답이 대충 괜찮아 보인다"로 결정하면 안 된다. 최소한 기존 eval dataset에서 pass rate, latency, token usage, 실패 유형을 비교해야 한다.
+모델 변경은 단순 설정 변경이 아니라 dependency upgrade다. `openai:gpt-5.4`에서 `openai:gpt-5.5`로 올리거나, 비싼 모델을 저렴한 모델로 낮추거나, provider를 바꿀 때 "응답이 대충 괜찮아 보인다"로 결정하면 안 된다. 최소한 기존 eval dataset에서 pass rate, latency, token usage, 실패 유형을 비교해야 한다.
 
 핵심은 이렇다.
 
@@ -291,7 +291,7 @@ uv run python examples/04_evals/rag_tool_use_eval.py
 `examples/04_evals/compare_models.py`는 이 흐름을 보여주는 작은 예제다. `EVAL_MODELS`에 후보 모델을 comma-separated로 넣고, 같은 dataset을 각 모델에 대해 실행한다.
 
 ```bash
-EVAL_MODELS=openai:gpt-5.1,openai:gpt-5.2 \
+EVAL_MODELS=openai:gpt-5.4,openai:gpt-5.5 \
 EVAL_REPEAT=2 \
 EVAL_MAX_CONCURRENCY=2 \
 EVAL_MIN_ASSERTION_RATE=0.8 \
@@ -614,7 +614,7 @@ resumed_result = agent.run_sync(
 
 1. "답변에 source가 반드시 포함되어야 한다."
    - eval
-2. "모델을 `gpt-5.1`에서 `gpt-5.2`로 바꾸고 싶다."
+2. "모델을 `gpt-5.4`에서 `gpt-5.5`로 바꾸고 싶다."
    - model-switch eval + CI/manual gate
 3. "RAG 답변이 틀렸는데 검색이 틀린 건지 답변 생성이 틀린 건지 모르겠다."
    - RAG retrieval eval + answer eval 분리

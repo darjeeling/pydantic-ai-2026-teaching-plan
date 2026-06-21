@@ -70,7 +70,7 @@ dataset = Dataset[str, str, dict[str, Any]](
 )
 
 agent = Agent(
-    os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2"),
+    os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5"),
     instructions=(
         "You are a Pydantic AI course assistant. Answer in Korean. "
         "Use the course lesson markers exactly as requested by the question category: "
@@ -108,7 +108,7 @@ def assert_report_threshold(model_name: str, report, threshold: float) -> None:
 def compare_models() -> None:
     models = [
         model.strip()
-        for model in os.getenv("EVAL_MODELS", "openai:gpt-5.1,openai:gpt-5.2").split(",")
+        for model in os.getenv("EVAL_MODELS", "openai:gpt-5.4,openai:gpt-5.5").split(",")
         if model.strip()
     ]
     repeat = int(os.getenv("EVAL_REPEAT", "1"))

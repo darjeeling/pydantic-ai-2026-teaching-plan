@@ -14,7 +14,7 @@ dbos_config: DBOSConfig = {
 }
 DBOS(config=dbos_config)
 
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 
 agent = Agent(
     model,

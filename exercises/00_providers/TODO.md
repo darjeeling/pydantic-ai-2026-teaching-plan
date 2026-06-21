@@ -94,8 +94,8 @@ tail -n 20 logs/api-calls.log
 ```bash
 COURSE_MODEL=openrouter:anthropic/claude-sonnet-4.6
 COURSE_MODEL=bedrock:anthropic.claude-sonnet-4-5-20250929-v1:0
-COURSE_MODEL=google:gemini-3-pro-preview
-COURSE_MODEL=google-cloud:gemini-3-pro-preview
+COURSE_MODEL=google:gemini-3.1-pro-preview
+COURSE_MODEL=google-cloud:gemini-3.1-pro-preview
 ```
 
 ## 제출할 메모

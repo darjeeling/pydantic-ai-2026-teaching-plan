@@ -31,7 +31,7 @@
 ```sql
 SELECT source, title, content
 FROM doc_chunks
-ORDER BY embedding <-> $1::vector
+ORDER BY embedding <=> $1::vector
 LIMIT 5;
 ```
 

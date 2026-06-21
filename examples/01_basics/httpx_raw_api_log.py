@@ -16,14 +16,14 @@ DEFAULT_PROMPT = "Pydantic AI를 처음 배우는 사람에게 한 문단으로 
 
 
 def openai_model_id() -> str:
-    course_model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL") or "openai:gpt-5.2"
+    course_model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL") or "openai:gpt-5.5"
     prefix, separator, model_id = course_model.partition(":")
     if not separator:
         return course_model
     if prefix not in {"openai", "openai-chat", "openai-responses"}:
         raise ValueError(
             "httpx_raw_api_log.py is intentionally OpenAI-only. "
-            "Use COURSE_MODEL=openai:gpt-5.2 for this raw HTTP exercise."
+            "Use COURSE_MODEL=openai:gpt-5.5 for this raw HTTP exercise."
         )
     return model_id
 

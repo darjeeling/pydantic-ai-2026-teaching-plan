@@ -19,7 +19,7 @@ except ModuleNotFoundError as exc:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from examples.course_logging import api_logger, configure_api_call_logging
 
-DEFAULT_MODEL = "openai:gpt-5.2"
+DEFAULT_MODEL = "openai:gpt-5.5"
 
 
 @dataclass(frozen=True)
@@ -36,7 +36,7 @@ PROVIDER_HINTS = (
         name="OpenAI",
         prefixes=("openai", "openai-chat", "openai-responses"),
         env_vars=("OPENAI_API_KEY",),
-        example_model="openai:gpt-5.2",
+        example_model="openai:gpt-5.5",
         note="수업 기본값. v2 prefix 경고가 있으면 openai-chat 또는 openai-responses를 명시합니다.",
     ),
     ProviderHint(
@@ -57,14 +57,14 @@ PROVIDER_HINTS = (
         name="Google AI Studio / Gemini API",
         prefixes=("google",),
         env_vars=("GOOGLE_API_KEY",),
-        example_model="google:gemini-3-pro-preview",
+        example_model="google:gemini-3.1-pro-preview",
         note="AI Studio에서 만든 Gemini API key를 사용합니다.",
     ),
     ProviderHint(
         name="Google Cloud / Vertex AI",
         prefixes=("google-cloud",),
         env_vars=("GOOGLE_CLOUD_PROJECT", "GOOGLE_CLOUD_LOCATION", "GOOGLE_API_KEY"),
-        example_model="google-cloud:gemini-3-pro-preview",
+        example_model="google-cloud:gemini-3.1-pro-preview",
         note="ADC, service account, 또는 Vertex AI Express Mode API key를 사용할 수 있습니다.",
     ),
 )
@@ -134,7 +134,7 @@ def parse_args() -> argparse.Namespace:
         default=model_from_env(),
         help=(
             "Pydantic AI model string. Defaults to COURSE_MODEL, "
-            "OPENAI_MODEL, then openai:gpt-5.2."
+            "OPENAI_MODEL, then openai:gpt-5.5."
         ),
     )
     parser.add_argument(

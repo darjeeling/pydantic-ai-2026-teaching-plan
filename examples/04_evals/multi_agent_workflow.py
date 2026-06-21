@@ -7,7 +7,7 @@ from pydantic_ai import Agent, RunContext, UsageLimits
 
 load_dotenv()
 
-model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.2")
+model = os.getenv("COURSE_MODEL") or os.getenv("OPENAI_MODEL", "openai:gpt-5.5")
 
 researcher = Agent(
     model,

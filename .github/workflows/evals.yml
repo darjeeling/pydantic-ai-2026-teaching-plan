@@ -10,7 +10,7 @@ on:
       eval_models:
         description: "Comma-separated model candidates for model-switch evals"
         required: false
-        default: "openai:gpt-5.1,openai:gpt-5.2"
+        default: "openai:gpt-5.4,openai:gpt-5.5"
       repeat:
         description: "Repeat count per eval case"
         required: false

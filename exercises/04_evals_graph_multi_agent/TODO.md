@@ -37,7 +37,7 @@
 4. `EVAL_MIN_ASSERTION_RATE`를 0.8에서 0.95로 올리면 어떤 PR이 막힐지 토론한다.
 
 ```bash
-EVAL_MODELS=openai:gpt-5.1,openai:gpt-5.2 \
+EVAL_MODELS=openai:gpt-5.4,openai:gpt-5.5 \
 EVAL_REPEAT=2 \
 EVAL_MIN_ASSERTION_RATE=0.95 \
 uv run python examples/04_evals/compare_models.py

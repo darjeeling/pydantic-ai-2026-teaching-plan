@@ -60,7 +60,7 @@ provider 3회 * DBOS 3회 = 최대 9회
 ## Pydantic AI 통합
 
 ```python
-agent = Agent("gpt-5.2", name="course_qa")
+agent = Agent("gpt-5.5", name="course_qa")
 dbos_agent = DBOSAgent(agent)
 ```
 
