@@ -1,8 +1,8 @@
 # Pydantic AI 2026 Teaching Plan
 
-Pydantic AI를 처음 배우는 개발자를 대상으로, 2일 워크숍 분량을 2~3시간짜리 사전 준비 1회와 본 수업 5회 실습으로 나눈 교안입니다. 수강생은 AI 앱 초보라고 가정하되, 백엔드 실무자가 운영 환경에서 고민해야 하는 타입, 도구, DB, 평가, 격리, 내구 실행, 웹 API 관점을 함께 다룹니다.
+Pydantic AI를 처음 배우는 개발자를 위한 교안입니다. 2일 워크숍 분량을 2~3시간짜리 사전 준비 1회와 본 수업 5회 실습으로 나눴습니다. 수강생이 AI 앱을 처음 다룬다고 가정하되, 백엔드 실무자가 운영 환경에서 마주치는 타입, 도구, DB, 평가, 격리, 내구 실행, 웹 API 관점을 함께 다룹니다.
 
-이 과정은 Python 문법이나 전통 ML 모델 학습 과정이 아니라, Python으로 LLM/RAG/Agent 서비스를 만드는 앱 엔지니어링 과정입니다. pandas/EDA/scikit-learn, MLflow/Airflow, vLLM/Kubernetes는 본편에서 운영 경계로 언급하고 심화반 후보로 분리합니다.
+이 과정은 Python 문법이나 전통 ML 모델 학습이 아니라, Python으로 LLM/RAG/Agent 서비스를 만드는 앱 엔지니어링에 초점을 둡니다. pandas/EDA/scikit-learn, MLflow/Airflow, vLLM/Kubernetes는 본편에서 운영 경계로만 짚고 심화반 후보로 분리합니다.
 
 ## Course Goals
 
@@ -28,7 +28,7 @@ Pydantic AI를 처음 배우는 개발자를 대상으로, 2일 워크숍 분량
 | 4 | 2~3h | Evals, Graph, multi-agent workflow | 품질 eval, RAG/tool-use eval, typed graph, agent delegation 예제 |
 | 5 | 2~3h | DBOS durable execution, graph resume, FastAPI chatbot | durable agent, graph checkpoint/resume, 웹 챗봇, 서비스화 체크리스트 |
 
-각 회차의 실제 진행 기준은 `lessons/` 문서입니다. 모든 레슨은 120분 운영안, 강사용 설명 스크립트, 라이브코딩 흐름, 실습, 리뷰 질문을 포함하도록 작성했습니다. `slides/`는 발표 보조 자료로 짧게 유지했습니다. 0회차는 credential과 cloud 권한 문제를 1회차에서 분리하기 위한 사전 준비 수업입니다.
+각 회차의 실제 진행 기준은 `lessons/` 문서입니다. 모든 레슨은 120분 운영안, 강사용 설명 스크립트, 라이브코딩 흐름, 실습, 리뷰 질문을 담고 있습니다. `slides/`는 발표 보조 자료라 짧게 유지했습니다. 0회차는 credential과 cloud 권한 문제를 1회차에서 떼어내기 위한 사전 준비 수업입니다.
 
 ## Repository Layout
 
@@ -48,9 +48,9 @@ uv sync
 cp .env.example .env
 ```
 
-`.env`에 사용할 provider credential을 설정합니다. 기본값은 OpenAI이므로 `OPENAI_API_KEY`와 `COURSE_MODEL=openai:gpt-5.2`를 넣으면 바로 시작할 수 있습니다. 기존 예제 호환을 위해 `OPENAI_MODEL`도 fallback으로 남겨 두었습니다. Pydantic AI가 `openai:` prefix의 v2 동작 변경 경고를 출력하면, 현재 Chat Completions 동작을 고정하려면 `COURSE_MODEL=openai-chat:gpt-5.2`를, Responses API를 명시하려면 `COURSE_MODEL=openai-responses:gpt-5.2`를 사용합니다.
+`.env`에 사용할 provider credential을 설정합니다. 기본값이 OpenAI라서 `OPENAI_API_KEY`와 `COURSE_MODEL=openai:gpt-5.2`만 넣으면 바로 시작할 수 있습니다. 기존 예제와의 호환을 위해 `OPENAI_MODEL`도 fallback으로 남겨 두었습니다. Pydantic AI가 `openai:` prefix에 대해 v2 동작 변경 경고를 띄우면, 현재 Chat Completions 동작을 고정하려면 `COURSE_MODEL=openai-chat:gpt-5.2`를, Responses API를 명시하려면 `COURSE_MODEL=openai-responses:gpt-5.2`를 씁니다.
 
-VS Code 실습은 `.vscode/`의 workspace 설정을 사용합니다. 공통 권장 확장은 `astral-sh.ty`, `charliermarsh.ruff`, `ms-python.python`입니다. Windows host에는 WSL 연결용 `ms-vscode-remote.remote-wsl`도 필요합니다. AI assistant는 실습 도구로 쓰지 않습니다. 자동완성, hover, go-to-definition은 `ty` language server로 확인합니다.
+VS Code 실습은 `.vscode/`의 workspace 설정을 따릅니다. 공통으로 권장하는 확장은 `astral-sh.ty`, `charliermarsh.ruff`, `ms-python.python`이고, Windows host에서는 WSL 연결용 `ms-vscode-remote.remote-wsl`도 필요합니다. AI assistant는 실습 도구로 쓰지 않습니다. 자동완성, hover, go-to-definition은 `ty` language server로 확인합니다.
 
 ```bash
 uv run ty check
@@ -59,7 +59,7 @@ uv run ruff check examples
 
 ## Documentation Site
 
-이 repo는 GitHub Pages 배포를 염두에 둔 Sphinx 문서 사이트를 `docs/` 아래에 둡니다. 참조 사이트처럼 홈에는 커리큘럼을 두고, 왼쪽 내비게이션에서 강사용 교안, 실습, 슬라이드, 분석 문서를 이동할 수 있게 구성했습니다.
+이 repo는 GitHub Pages 배포를 염두에 둔 Sphinx 문서 사이트를 `docs/` 아래에 둡니다. 홈에는 커리큘럼을 두고, 왼쪽 내비게이션에서 강사용 교안, 실습, 슬라이드, 분석 문서로 이동할 수 있게 구성했습니다.
 
 로컬 빌드:
 
@@ -68,7 +68,7 @@ uv sync --group docs
 uv run --group docs sphinx-build -b html docs docs/_build/html
 ```
 
-빌드 결과는 `docs/_build/html/index.html`에서 확인합니다. GitHub Pages 배포는 `.github/workflows/docs.yml`이 담당합니다. 저장소 URL 아이콘을 Sphinx 테마에 표시하려면 workflow 또는 Pages 환경에서 `DOCS_SOURCE_REPOSITORY`를 `https://github.com/<owner>/<repo>/` 형식으로 설정합니다.
+빌드 결과는 `docs/_build/html/index.html`에서 확인합니다. GitHub Pages 배포는 `.github/workflows/docs.yml`이 맡습니다. 저장소 URL 아이콘을 Sphinx 테마에 표시하려면 workflow나 Pages 환경에서 `DOCS_SOURCE_REPOSITORY`를 `https://github.com/<owner>/<repo>/` 형식으로 설정합니다.
 
 ## Maintenance CI
 
@@ -81,15 +81,15 @@ uv run --group docs sphinx-build -b html docs docs/_build/html
 
 ### Windows / WSL
 
-Windows 수강생은 Windows native Python 환경이 아니라 WSL 2에서 실습합니다. 이 repo의 VS Code 설정은 `.venv/bin/python`을 기준으로 하므로, Windows에서도 WSL 안에서 `code .`로 열어야 Linux/macOS와 같은 경로로 동작합니다.
+Windows 수강생은 Windows native Python 환경이 아니라 WSL 2에서 실습합니다. 이 repo의 VS Code 설정이 `.venv/bin/python`을 기준으로 하기 때문에, Windows에서도 WSL 안에서 `code .`로 열어야 Linux/macOS와 같은 경로로 동작합니다.
 
-PowerShell에서 WSL을 설치합니다.
+먼저 PowerShell에서 WSL을 설치합니다.
 
 ```powershell
 wsl --install
 ```
 
-재부팅과 Ubuntu 초기 계정 설정 후, Ubuntu/WSL 터미널에서 진행합니다.
+재부팅과 Ubuntu 초기 계정 설정을 마쳤으면, Ubuntu/WSL 터미널에서 이어 진행합니다.
 
 ```bash
 sudo apt update
@@ -119,21 +119,21 @@ COURSE_MODEL=openrouter:anthropic/claude-sonnet-4.6 \
   uv run python examples/00_providers/provider_smoke_test.py --dry-run
 ```
 
-1회차에서는 먼저 raw HTTPX 호출을 실행해 request/response가 실제 파일에 어떻게 남는지 확인합니다. 이 로그는 prompt와 response body를 포함하므로 수업용으로만 사용합니다.
+1회차에서는 먼저 raw HTTPX 호출을 실행해 request/response가 실제 파일에 어떻게 남는지 봅니다. 이 로그에는 prompt와 response body가 그대로 담기므로 수업용으로만 씁니다.
 
 ```bash
 uv run python examples/01_basics/httpx_raw_api_log.py
 tail -n 20 logs/httpx-raw-api.log
 ```
 
-그 다음 Pydantic AI 예제에서는 안전한 breadcrumb 로그만 남깁니다. 기본 로그는 payload를 남기지 않고, model string, request 시작/종료, usage, HTTPX request line/status 수준만 남깁니다.
+그다음 Pydantic AI 예제부터는 안전한 breadcrumb 로그만 남깁니다. 기본 로그는 payload를 빼고 model string, request 시작/종료, usage, HTTPX request line/status 정도만 기록합니다.
 
 ```bash
 uv run python examples/01_basics/hello_agent.py
 tail -n 30 logs/api-calls.log
 ```
 
-로그 위치는 `COURSE_API_LOG_FILE=logs/api-calls.log`로 바꿀 수 있고, 필요 없으면 `COURSE_API_LOG_DISABLED=1`을 설정합니다.
+로그 위치는 `COURSE_API_LOG_FILE=logs/api-calls.log`로 바꿀 수 있고, 로그가 필요 없으면 `COURSE_API_LOG_DISABLED=1`을 설정합니다.
 
 RAG 실습은 pgvector가 필요합니다.
 
@@ -143,7 +143,7 @@ uv run python examples/02_rag/load_docs.py
 uv run python examples/02_rag/rag_agent.py "Pydantic AI에서 tool은 언제 쓰나요?"
 ```
 
-OpenAI embedding 대신 로컬 embedding을 쓰려면 2회차 교안의 "Embedding model 선택"을 참고합니다. 예를 들어 Ollama를 사용할 수 있습니다.
+OpenAI embedding 대신 로컬 embedding을 쓰려면 2회차 교안의 "Embedding model 선택"을 참고합니다. 예를 들어 Ollama를 쓸 수 있습니다.
 
 ```bash
 ollama pull embeddinggemma
@@ -161,7 +161,7 @@ EMBEDDING_PROVIDER=ollama EMBEDDING_MODEL=embeddinggemma EMBEDDING_DIMENSIONS= R
 
 ## Reference Sources
 
-이 교안은 2026-06-11 기준 최신 자료를 확인해 작성했습니다.
+이 교안은 2026-06-11 기준 최신 자료를 확인하며 작성했습니다.
 
 - Pydantic AI: https://github.com/pydantic/pydantic-ai
 - Pydantic AI docs: https://pydantic.dev/docs/ai/overview/

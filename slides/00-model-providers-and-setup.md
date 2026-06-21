@@ -11,11 +11,11 @@
 
 ## 왜 별도 회차인가
 
-1회차는 Agent, Logfire, tools, deps, output type만으로 충분히 빽빽하다.
+1회차는 Agent, Logfire, tools, deps, output type만으로도 이미 빽빽하다.
 
-Provider 설정은 코드보다 계정, 권한, region, 비용, 데이터 경로 문제다.
+Provider 설정은 코드 문제라기보다 계정, 권한, region, 비용, 데이터 경로 문제다.
 
-개발 환경 설정은 코드보다 재현성 문제다.
+개발 환경 설정도 코드보다 재현성 문제다.
 
 ## 실습 도구
 
@@ -89,7 +89,7 @@ Agent code
 
 ## Capability Check
 
-provider 이름만으로는 부족하다.
+provider 이름만 보고 고르면 안 된다.
 
 - structured output
 - tool calling
@@ -127,7 +127,7 @@ COURSE_MODEL=google:gemini-3-pro-preview \
 ## Bedrock
 
 - AWS account, IAM, region, model access 필요
-- `AWS_DEFAULT_REGION` 누락이 흔함
+- `AWS_DEFAULT_REGION` 누락이 흔한 실수
 - Bedrock/boto3 진단은 Logfire와 AWS 로그를 같이 본다.
 
 ## Google
@@ -142,4 +142,4 @@ COURSE_MODEL=google:gemini-3-pro-preview \
 - VS Code에서 ty completion이 동작한다.
 - 실제 호출 또는 강사 demo를 확인했다.
 - `COURSE_MODEL`이 정해졌다.
-- credential 없는 수강생은 실패 원인과 다음 확인 위치를 설명할 수 있다.
+- credential이 없는 수강생도 실패 원인과 다음에 확인할 곳을 설명할 수 있다.

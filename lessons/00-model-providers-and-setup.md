@@ -2,27 +2,27 @@
 
 ## 2시간 목표
 
-이 회차는 1회차 앞에 두는 사전 준비 수업이다. 1회차에 `Agent`, Logfire, tool, deps, structured output을 모두 다루면 시간이 이미 꽉 찬다. 여기에 VS Code 설정, `uv` 환경, `ty` 자동완성, OpenRouter, AWS Bedrock, Google AI Studio, Google Cloud Vertex까지 한꺼번에 설명하면 수강생은 agent 개념보다 개발 환경과 cloud 권한 문제에 시간을 쓰게 된다. 그래서 실행 환경과 공급자 설정은 0회차로 분리한다.
+이 회차는 1회차 앞에 두는 사전 준비 수업이다. 1회차에 `Agent`, Logfire, tool, deps, structured output을 모두 다루면 시간이 이미 꽉 찬다. 여기에 VS Code 설정, `uv` 환경, `ty` 자동완성, OpenRouter, AWS Bedrock, Google AI Studio, Google Cloud Vertex까지 얹으면, 수강생은 agent 개념보다 개발 환경과 cloud 권한 문제에 시간을 쓰게 된다. 그래서 실행 환경과 공급자 설정은 0회차로 떼어 둔다.
 
 수업이 끝나면 수강생은 다음을 할 수 있어야 한다.
 
-- Pydantic AI의 모델 문자열이 `provider:model-id` 형태라는 점을 설명한다.
-- `uv sync`, `uv run`, `uv lock`, `uv add --dev`가 수업 환경에서 어떤 역할을 하는지 설명한다.
-- VS Code workspace 설정으로 `.venv` interpreter, Ruff formatter, `ty` language server를 사용한다.
+- Pydantic AI의 모델 문자열이 `provider:model-id` 형태라는 걸 한 문장으로 설명한다.
+- `uv sync`, `uv run`, `uv lock`, `uv add --dev`가 수업 환경에서 각각 어떤 역할을 하는지 말한다.
+- VS Code workspace 설정으로 `.venv` interpreter, Ruff formatter, `ty` language server를 쓴다.
 - AI assistant 없이 `ty`의 자동완성, hover, go-to-definition, diagnostics를 확인한다.
 - `COURSE_MODEL` 하나로 OpenAI, OpenRouter, Bedrock, Google AI Studio, Google Cloud Vertex 모델을 바꿔 실행한다.
 - 공급자별 필수 인증값, region/project 설정, 계정 권한 오류를 구분한다.
-- Logfire trace를 켠 상태에서 provider smoke test를 실행하고, 실패 위치가 설정 문제인지 모델 호출 문제인지 판단한다.
+- Logfire trace를 켠 채로 provider smoke test를 돌리고, 실패 위치가 설정 문제인지 모델 호출 문제인지 가린다.
 
-완성 결과물은 VS Code에서 `ty` 자동완성이 켜진 상태로 `examples/00_providers/provider_smoke_test.py`를 읽고 수정할 수 있는 개발 환경과 provider 연결 확인표다. 실제 수업에서는 조별로 서로 다른 provider를 하나씩 맡아 dry-run과 실제 호출 결과를 공유한다.
+완성 결과물은 두 가지다. 하나는 VS Code에서 `ty` 자동완성이 켜진 채로 `examples/00_providers/provider_smoke_test.py`를 읽고 고칠 수 있는 개발 환경, 다른 하나는 provider 연결 확인표다. 실제 수업에서는 조별로 서로 다른 provider를 하나씩 맡아 dry-run과 실제 호출 결과를 공유한다.
 
 ## 사례로 시작하기: "코드는 같은데 왜 내 컴퓨터에서만 실패하나요?"
 
-수업 첫 질문은 일부러 코드 문제가 아닌 환경 문제로 시작한다.
+수업 첫 질문은 일부러 코드 문제가 아니라 환경 문제로 연다.
 
-한 수강생은 `COURSE_MODEL=openai:gpt-5.2`로 예제가 바로 실행된다. 옆자리 수강생은 같은 repo를 clone했는데 `ModuleNotFoundError`가 난다. 또 다른 수강생은 OpenRouter key를 넣었지만 tool calling이 안 되고, Bedrock을 쓰는 수강생은 Python 에러가 아니라 `AccessDeniedException`을 본다. Google Vertex를 쓰는 수강생은 모델 이름은 맞는데 project/location 설정이 없어서 실패한다.
+한 수강생은 `COURSE_MODEL=openai:gpt-5.2`로 예제가 바로 돈다. 옆자리 수강생은 같은 repo를 clone했는데 `ModuleNotFoundError`가 난다. 또 다른 수강생은 OpenRouter key를 넣었지만 tool calling이 안 되고, Bedrock을 쓰는 수강생은 Python 에러가 아니라 `AccessDeniedException`을 본다. Google Vertex를 쓰는 수강생은 모델 이름은 맞는데 project/location 설정이 없어서 막힌다.
 
-이 상황에서 초보자는 보통 "Pydantic AI 코드가 어렵다"고 느낀다. 하지만 실제 문제는 대부분 아래 네 층 중 하나다.
+이쯤 되면 초보자는 보통 "Pydantic AI 코드가 어렵다"고 느낀다. 하지만 실제 원인은 대부분 아래 네 층 중 하나다.
 
 ```text
 Python 실행 환경
@@ -35,7 +35,7 @@ model capability
   -> 이 모델이 structured output, tool calling, streaming을 지원하는가?
 ```
 
-이 사례에서 학생이 가져가야 할 감각은 "AI 앱 디버깅은 prompt만 보는 일이 아니다"이다. provider가 바뀌면 비용, region, data path, logging retention, quota, tool calling 지원 여부가 함께 바뀐다. 그래서 0회차의 핵심은 멋진 agent를 만드는 것이 아니라, 1회차부터 같은 실패를 같은 이름으로 부를 수 있게 만드는 것이다.
+이 사례에서 학생이 가져가야 할 감각은 "AI 앱 디버깅은 prompt만 들여다보는 일이 아니다"이다. provider가 바뀌면 비용, region, data path, logging retention, quota, tool calling 지원 여부가 통째로 따라 바뀐다. 그래서 0회차의 핵심은 멋진 agent를 만드는 게 아니라, 1회차부터 같은 실패를 같은 이름으로 부를 수 있게 만드는 데 있다.
 
 강사가 던질 질문:
 
@@ -49,12 +49,12 @@ model capability
 - `cp .env.example .env`
 - VS Code 설치
 - VS Code 권장 확장: `astral-sh.ty`, `charliermarsh.ruff`, `ms-python.python`
-- Windows 수강생은 WSL 2와 VS Code WSL extension 준비
+- Windows 수강생은 WSL 2와 VS Code WSL extension 준비 (자세한 절차는 아래 "Windows / WSL 사전 준비" 참고)
 - 최소 하나의 LLM provider credential
 - Logfire hosted UI를 보려면 `uv run logfire auth` 후 `uv run logfire projects use <project>`
-- 로컬 API 호출 로그는 기본적으로 `logs/api-calls.log`에 남긴다. 로그 파일은 수업 중 확인용이며 git에는 포함하지 않는다.
+- 로컬 API 호출 로그는 기본적으로 `logs/api-calls.log`에 남긴다. 수업 중 확인용이고 git에는 넣지 않는다.
 
-이 수업에서는 AI assistant를 쓰지 않는다. GitHub Copilot, Copilot Chat, Cursor/Cline류 코드 생성 기능은 꺼 두거나 사용하지 않는다. 자동완성은 `ty` language server가 제공하는 completion, hover, signature help, go-to-definition만 사용한다. 실습의 목적은 "모델이 코드를 대신 쓰는 경험"이 아니라 "타입이 있는 Python 코드가 편집기에서 어떻게 보조되는지 확인하는 경험"이다.
+이 수업에서는 AI assistant를 쓰지 않는다. GitHub Copilot, Copilot Chat, Cursor/Cline류 코드 생성 기능은 꺼 두거나 손대지 않는다. 자동완성은 `ty` language server가 주는 completion, hover, signature help, go-to-definition만 쓴다. 목적은 "모델이 코드를 대신 써 주는 경험"이 아니라 "타입이 붙은 Python 코드가 편집기에서 어떻게 보조되는지 직접 확인하는 경험"이기 때문이다.
 
 기본 실행 확인:
 
@@ -85,11 +85,11 @@ COURSE_MODEL=google:gemini-3-pro-preview \
 tail -n 20 logs/api-calls.log
 ```
 
-이 로그는 prompt나 response payload를 기본으로 남기지 않는다. `agent.run_sync start/done`, model string, usage, `httpx` request line/status처럼 "호출이 발생했는가"를 확인하는 breadcrumb만 남긴다. 더 깊게 봐야 할 때만 `LOGFIRE_CAPTURE_HTTPX=1`을 사용한다.
+이 로그는 prompt나 response payload를 기본으로 남기지 않는다. `agent.run_sync start/done`, model string, usage, `httpx` request line/status처럼 "호출이 나갔는가"만 확인하는 breadcrumb다. 더 깊게 파야 할 때만 `LOGFIRE_CAPTURE_HTTPX=1`을 켠다.
 
 ### Windows / WSL 사전 준비
 
-Windows 수강생은 Windows native Python, PowerShell의 `uv`, WSL의 `uv`를 섞지 않는다. 이 수업에서는 WSL 2 안의 Ubuntu를 기준 환경으로 삼는다. 이유는 세 가지다.
+Windows 수강생은 Windows native Python, PowerShell의 `uv`, WSL의 `uv`를 섞어 쓰지 않는다. 이 수업의 기준 환경은 WSL 2 안의 Ubuntu다. 이렇게 잡는 이유는 세 가지다.
 
 - `.vscode/settings.json`이 `${workspaceFolder}/.venv/bin/python`을 가리킨다.
 - 수업 명령과 Docker/Postgres/pgvector 흐름을 Linux 경로 기준으로 통일할 수 있다.
@@ -101,7 +101,7 @@ PowerShell에서 WSL을 설치한다.
 wsl --install
 ```
 
-재부팅이 필요할 수 있다. Ubuntu가 처음 열리면 Linux 사용자명과 비밀번호를 만든다. 이후 모든 수업 명령은 Ubuntu/WSL 터미널에서 실행한다.
+재부팅이 필요할 수 있다. Ubuntu를 처음 열면 Linux 사용자명과 비밀번호를 만든다. 이후 수업 명령은 모두 Ubuntu/WSL 터미널에서 실행한다.
 
 ```bash
 sudo apt update
@@ -120,12 +120,12 @@ cd pydantic-ai-2026-teaching-plan
 code .
 ```
 
-강사가 강조할 점:
+이렇게 짚어 준다.
 
 - `code .`는 PowerShell이 아니라 WSL 터미널에서 실행한다.
 - VS Code 왼쪽 아래가 `WSL: Ubuntu`처럼 표시되어야 한다.
-- `/mnt/c/Users/...` 아래에 clone하지 않는다. Linux 도구로 작업할 때는 `~/src/...` 아래가 더 빠르고 경로 문제가 적다.
-- VS Code Windows 창 안에서 열려 있어도 터미널, extension host, Python interpreter는 WSL 쪽이어야 한다.
+- `/mnt/c/Users/...` 아래에 clone하지 않는다. Linux 도구로 작업할 때는 `~/src/...` 아래가 더 빠르고 경로 문제도 적다.
+- VS Code 창이 Windows에 떠 있어도 터미널, extension host, Python interpreter는 WSL 쪽이어야 한다.
 - WSL 안에서 `uv --version`, `uv run python --version`, `uv run ty check`가 통과해야 1회차로 넘어간다.
 
 ## 120분 진행안
@@ -147,9 +147,9 @@ code .
 
 ## 도입 이야기
 
-수업을 이렇게 시작한다.
+수업은 이렇게 연다.
 
-"Pydantic AI 코드는 provider가 바뀌어도 대부분 그대로 유지됩니다. 하지만 수업이 제대로 진행되려면 두 가지가 먼저 맞아야 합니다. 첫째, 모두가 같은 Python 환경에서 같은 명령을 실행해야 합니다. 둘째, 모델 공급자 설정 실패와 코드 실패를 구분할 수 있어야 합니다. OpenRouter는 하나의 key로 여러 모델을 라우팅하고, Bedrock은 IAM과 region과 모델 접근 권한이 필요하고, Google은 AI Studio와 Vertex가 서로 다른 인증/운영 모델을 가집니다. 이 차이를 모른 채 1회차 agent 실습을 시작하면 코드가 틀린 것인지 계정 설정이 틀린 것인지 구분하지 못합니다."
+"Pydantic AI 코드는 provider가 바뀌어도 대부분 그대로 갑니다. 그런데 수업이 제대로 굴러가려면 두 가지가 먼저 맞아야 해요. 첫째, 모두가 같은 Python 환경에서 같은 명령을 돌려야 합니다. 둘째, 모델 공급자 설정이 틀린 건지 코드가 틀린 건지 구분할 수 있어야 해요. OpenRouter는 key 하나로 여러 모델을 라우팅하고, Bedrock은 IAM과 region과 모델 접근 권한이 필요하고, Google은 AI Studio와 Vertex가 서로 다른 인증/운영 모델을 씁니다. 이 차이를 모른 채 1회차 agent 실습에 들어가면, 코드가 틀린 건지 계정 설정이 틀린 건지 끝까지 헷갈려요."
 
 칠판에는 다음처럼 쓴다.
 
@@ -163,13 +163,13 @@ model string: provider:model-id
 provider credentials + region/project + account permissions
 ```
 
-핵심 메시지는 세 가지다. 첫째, `uv`는 수업의 실행 재현성을 만든다. 둘째, `ty`는 AI assistant 없이도 타입 기반 자동완성과 진단을 제공한다. 셋째, Pydantic AI의 코드 경계는 단순하지만 provider 경계는 운영 경계다. 수강생은 1회차부터 `Agent(model, ...)`을 볼 것이므로, 이 `model` 값이 단순 문자열이 아니라 배포/비용/데이터 경로를 결정한다는 감각을 먼저 가져야 한다.
+핵심 메시지는 세 가지다. 첫째, `uv`는 수업의 실행 재현성을 만든다. 둘째, `ty`는 AI assistant 없이도 타입 기반 자동완성과 진단을 준다. 셋째, Pydantic AI의 코드 경계는 단순하지만 provider 경계는 운영 경계다. 수강생은 1회차부터 `Agent(model, ...)`을 볼 텐데, 이 `model` 값이 그냥 문자열이 아니라 배포와 비용과 데이터 경로를 정한다는 감각을 미리 가져야 한다.
 
 ## 개념 설명 스크립트
 
 ### uv 프로젝트 환경
 
-`uv`는 이 수업의 Python package/project manager다. 수강생에게는 "pip, venv, pip-tools, 일부 poetry 역할을 한 명령 체계로 묶은 도구"라고 설명한다. 중요한 것은 속도가 아니라 재현성이다.
+`uv`는 이 수업의 Python package/project manager다. 수강생에게는 "pip, venv, pip-tools, 그리고 poetry 일부 역할을 명령 하나로 묶은 도구"라고 소개한다. 여기서 중요한 건 속도가 아니라 재현성이다.
 
 이 repo에서 `uv`가 관리하는 파일:
 
@@ -178,12 +178,12 @@ provider credentials + region/project + account permissions
 - `.venv/`: `uv sync`가 만드는 격리된 Python 환경
 - `.python-version`: 수업 기준 Python minor version
 
-강사가 말할 포인트:
+이렇게 짚어 준다.
 
 - `uv sync`는 `pyproject.toml`과 `uv.lock`을 기준으로 `.venv`를 맞춘다.
 - `uv run ...`은 `.venv`를 직접 activate하지 않아도 프로젝트 환경에서 명령을 실행한다.
-- `uv add --dev ty`처럼 dependency를 추가하면 `pyproject.toml`과 `uv.lock`이 함께 바뀐다.
-- `uv.lock`은 사람이 손으로 고치는 파일이 아니라 `uv`가 관리하는 파일이다.
+- `uv add --dev ty`처럼 dependency를 추가하면 `pyproject.toml`과 `uv.lock`이 같이 바뀐다.
+- `uv.lock`은 손으로 고치는 파일이 아니라 `uv`가 관리하는 파일이다.
 
 수업에서 쓸 명령:
 
@@ -224,9 +224,9 @@ uv run python examples/00_providers/provider_smoke_test.py --dry-run
 - Cursor/Cline류 코드 생성 기능
 - 기타 AI assistant의 코드 작성/수정 제안
 
-강사가 이렇게 말한다.
+이렇게 말한다.
 
-"오늘 자동완성은 LLM이 코드를 추측해서 써 주는 기능이 아닙니다. ty가 현재 파일의 타입, dataclass field, 함수 signature, import 가능한 symbol을 보고 제공하는 language server 기능입니다. 이 차이를 분명히 해야 1회차부터 agent 코드의 타입 경계를 직접 읽고 고칠 수 있습니다."
+"오늘 쓰는 자동완성은 LLM이 코드를 추측해서 써 주는 기능이 아니에요. ty가 현재 파일의 타입, dataclass field, 함수 signature, import 가능한 symbol을 보고 제공하는 language server 기능입니다. 이 차이를 분명히 해 둬야 1회차부터 agent 코드의 타입 경계를 직접 읽고 고칠 수 있어요."
 
 실습:
 
@@ -257,7 +257,7 @@ from pydantic_ai import Agent
 agent = Agent("openrouter:anthropic/claude-sonnet-4.6")
 ```
 
-앞의 `openrouter`는 provider prefix이고, 뒤의 `anthropic/claude-sonnet-4.6`은 provider가 이해하는 model id다. 같은 agent 코드라도 모델 문자열을 바꾸면 다른 계정, 다른 billing, 다른 데이터 처리 경로, 다른 tool/structured output 지원 상태를 사용하게 된다.
+앞의 `openrouter`는 provider prefix이고, 뒤의 `anthropic/claude-sonnet-4.6`은 provider가 이해하는 model id다. 같은 agent 코드라도 모델 문자열을 바꾸면 계정도, billing도, 데이터 처리 경로도, tool/structured output 지원 상태도 통째로 달라진다.
 
 수업에서는 provider 중립 환경 변수로 `COURSE_MODEL`을 쓴다.
 
@@ -269,7 +269,7 @@ COURSE_MODEL=google:gemini-3-pro-preview
 COURSE_MODEL=google-cloud:gemini-3-pro-preview
 ```
 
-기존 `OPENAI_MODEL`은 fallback으로 남겨 둔다. 초보자 수업에서는 이름이 다소 어색해도 `OPENAI_MODEL`만 쓰면 provider 전환을 떠올리기 어렵다. 그래서 새 교안에서는 `COURSE_MODEL`을 우선 쓰고, OpenAI만 사용하는 환경도 깨지지 않게 `OPENAI_MODEL` fallback을 둔다.
+기존 `OPENAI_MODEL`은 fallback으로 남겨 둔다. 초보자 수업에서 `OPENAI_MODEL`만 쓰면 이름에 묶여서 provider를 바꿀 수 있다는 생각 자체를 잘 못 한다. 그래서 새 교안은 `COURSE_MODEL`을 먼저 쓰고, OpenAI만 쓰는 환경도 깨지지 않게 `OPENAI_MODEL` fallback을 같이 둔다.
 
 ### 공급자 선택 기준
 
@@ -281,16 +281,16 @@ COURSE_MODEL=google-cloud:gemini-3-pro-preview
 | Google AI Studio | `google:` | `GOOGLE_API_KEY` | Gemini API를 빠르게 실습하기 좋음 | 운영 통제는 Vertex보다 약함 |
 | Google Cloud Vertex | `google-cloud:` | ADC, service account, 또는 API key | project/location, enterprise control, quota 관리 | Cloud project, API enablement, region 설정 필요 |
 
-강사가 강조할 점:
+이렇게 짚어 준다.
 
 - provider 전환은 단순 성능 비교가 아니라 dependency 교체다.
 - 모델마다 tool calling, structured output, streaming, thinking, caching 지원이 다르다.
-- 계정 설정 실패와 Pydantic AI 코드 실패를 구분하려면 최소 smoke test가 필요하다.
-- 비용/데이터 처리 위치/로그 보존 정책은 코드 밖의 운영 의사결정이다.
+- 계정 설정 실패와 Pydantic AI 코드 실패를 가르려면 최소한의 smoke test가 필요하다.
+- 비용, 데이터 처리 위치, 로그 보존 정책은 코드 밖의 운영 의사결정이다.
 
 ### Provider Capability 확인
 
-같은 provider 안에서도 model마다 지원 기능이 다를 수 있다. "OpenAI를 쓴다", "Gemini를 쓴다"가 충분한 정보가 아니다. 실제 앱에서 필요한 기능을 먼저 정하고, 그 기능을 model/provider가 지원하는지 확인해야 한다.
+같은 provider 안에서도 model마다 지원 기능이 다를 수 있다. "OpenAI를 쓴다", "Gemini를 쓴다"만으로는 정보가 부족하다. 실제 앱에 필요한 기능을 먼저 정하고, 그 기능을 model과 provider가 받쳐 주는지 확인하는 순서가 맞다.
 
 수업에서 확인할 capability checklist:
 
@@ -305,11 +305,11 @@ COURSE_MODEL=google-cloud:gemini-3-pro-preview
 | Region/data path | 사용자 데이터가 어디로 가는가 | OpenRouter downstream provider, Bedrock/Vertex region 혼동 |
 | Logging/retention | prompt와 response가 어디에 저장되는가 | 민감 데이터가 provider 로그에 남음 |
 
-강사가 강조할 문장:
+이렇게 말한다.
 
-"모델 선택은 leaderboard에서 1등을 고르는 일이 아닙니다. 내 앱이 필요한 capability, 데이터 경로, 비용, 실패 모드를 만족하는 dependency를 고르는 일입니다."
+"모델 선택은 leaderboard에서 1등을 고르는 일이 아니에요. 내 앱에 필요한 capability, 데이터 경로, 비용, 실패 모드를 만족하는 dependency를 고르는 일입니다."
 
-Vision/NLP/멀티모달 수요는 여기서 짧게 언급한다. 이 과정은 별도 Vision 모델 학습 수업이 아니라 Pydantic AI 기반 LLM app engineering 수업이므로, 멀티모달은 provider capability와 입력 타입 확인 문제로 다룬다.
+Vision/NLP/멀티모달 수요는 여기서 짧게만 언급한다. 이 과정은 Vision 모델 자체를 파고드는 수업이 아니라 Pydantic AI 기반 LLM app engineering 수업이라, 멀티모달도 provider capability와 입력 타입 확인 문제로 본다.
 
 ## 공통 실습: provider smoke test
 
@@ -344,7 +344,7 @@ COURSE_MODEL=openrouter:anthropic/claude-sonnet-4.6 \
 
 ## OpenRouter
 
-OpenRouter는 여러 모델 provider를 하나의 API key와 model namespace로 사용할 수 있게 해 준다. 수업에서 모델 전환을 빠르게 보여주기 좋다.
+OpenRouter는 여러 모델 provider를 API key 하나와 model namespace 하나로 묶어 준다. 수업에서 모델 전환을 빠르게 보여 주기 좋다.
 
 환경 변수:
 
@@ -361,7 +361,7 @@ from pydantic_ai import Agent
 agent = Agent("openrouter:anthropic/claude-sonnet-4.6")
 ```
 
-provider를 직접 만들면 app attribution이나 API key 주입을 코드로 제어할 수 있다.
+provider를 직접 만들면 app attribution이나 API key 주입을 코드에서 제어할 수 있다.
 
 ```python
 from pydantic_ai import Agent
@@ -379,16 +379,16 @@ model = OpenRouterModel(
 agent = Agent(model)
 ```
 
-강사가 말할 운영 포인트:
+운영 관점에서 이렇게 짚어 준다.
 
-- OpenRouter key 하나만 보이지만 실제 추론은 downstream provider가 수행한다.
-- 모델 id는 OpenRouter catalog 기준이다. provider 공식 model id와 완전히 같다고 가정하지 않는다.
+- key 하나만 보이지만 실제 추론은 downstream provider가 한다.
+- 모델 id는 OpenRouter catalog 기준이다. provider 공식 model id와 똑같다고 단정하지 않는다.
 - tool calling, structured output, prompt caching 지원은 downstream 모델과 OpenRouter 지원 범위의 교집합이다.
-- 수업 중 모델 비교에는 편하지만, 운영 도입 전에는 데이터 처리 경로와 장애 책임 범위를 확인해야 한다.
+- 수업 중 모델 비교에는 편하지만, 운영에 넣기 전에는 데이터 처리 경로와 장애 책임 범위를 확인해야 한다.
 
 ## Google AI Studio / Gemini API
 
-Google AI Studio는 Gemini API key를 빠르게 만들 수 있어 개인 실습에 적합하다. Pydantic AI에서는 `GoogleProvider`가 이 경로를 담당하고, prefix는 `google:`이다. 예전 자료의 `google-gla:` prefix는 더 이상 새 교안에서 쓰지 않는다.
+Google AI Studio는 Gemini API key를 빠르게 발급할 수 있어 개인 실습에 좋다. Pydantic AI에서는 `GoogleProvider`가 이 경로를 맡고, prefix는 `google:`이다. 예전 자료의 `google-gla:` prefix는 새 교안에서 더 이상 쓰지 않는다.
 
 환경 변수:
 
@@ -417,15 +417,15 @@ model = GoogleModel("gemini-3-pro-preview", provider=provider)
 agent = Agent(model)
 ```
 
-강사가 말할 운영 포인트:
+운영 관점에서 이렇게 짚어 준다.
 
-- AI Studio는 수업과 프로토타입에 좋다.
-- 기업 운영, project별 quota, region 통제, provisioned throughput이 필요하면 Vertex 쪽을 검토한다.
-- `GOOGLE_API_KEY`는 Google AI Studio와 Vertex Express Mode에서 모두 보일 수 있으므로, 현재 prefix가 `google:`인지 `google-cloud:`인지 함께 확인한다.
+- AI Studio는 수업과 프로토타입에 맞는다.
+- 기업 운영, project별 quota, region 통제, provisioned throughput이 필요하면 Vertex 쪽을 본다.
+- `GOOGLE_API_KEY`는 Google AI Studio와 Vertex Express Mode 양쪽에서 보일 수 있으니, 지금 prefix가 `google:`인지 `google-cloud:`인지 같이 확인한다.
 
 ## Google Cloud Vertex
 
-Google Cloud Vertex는 Pydantic AI에서 `GoogleCloudProvider`가 담당하고, prefix는 `google-cloud:`이다. 예전 자료의 `google-vertex:` prefix는 새 코드에서 쓰지 않는다.
+Google Cloud Vertex는 Pydantic AI에서 `GoogleCloudProvider`가 맡고, prefix는 `google-cloud:`이다. 예전 자료의 `google-vertex:` prefix는 새 코드에서 쓰지 않는다.
 
 가장 흔한 개발자 로컬 흐름:
 
@@ -476,16 +476,16 @@ model = GoogleModel("gemini-3-flash-preview", provider=provider)
 agent = Agent(model)
 ```
 
-강사가 말할 운영 포인트:
+운영 관점에서 이렇게 짚어 준다.
 
 - Vertex AI API가 project에서 enabled 상태여야 한다.
-- ADC가 있다고 해서 모든 모델에 접근 가능한 것은 아니다. quota와 region별 모델 지원을 확인해야 한다.
-- `GOOGLE_CLOUD_LOCATION` 기본 후보로 `us-central1`을 많이 쓰지만, 한국 서비스에서는 latency, 규제, 모델 지원 범위를 따져 region을 정한다.
+- ADC가 있다고 모든 모델에 접근되는 건 아니다. quota와 region별 모델 지원을 확인해야 한다.
+- `GOOGLE_CLOUD_LOCATION`은 흔히 `us-central1`을 쓰지만, 한국 서비스라면 latency, 규제, 모델 지원 범위를 따져 region을 정한다.
 - API key를 쓰는 Express Mode와 ADC/service account 방식은 운영 권한 모델이 다르다.
 
 ## AWS Bedrock
 
-Bedrock은 기업 AWS 계정, IAM, region, 모델 접근 권한과 연결된다. Pydantic AI에서는 `BedrockConverseModel`을 쓰며 prefix는 `bedrock:`이다.
+Bedrock은 기업 AWS 계정, IAM, region, 모델 접근 권한과 한 묶음으로 엮인다. Pydantic AI에서는 `BedrockConverseModel`을 쓰며 prefix는 `bedrock:`이다.
 
 환경 변수 예:
 
@@ -516,16 +516,16 @@ model = BedrockConverseModel("anthropic.claude-sonnet-4-5-20250929-v1:0")
 agent = Agent(model)
 ```
 
-강사가 말할 운영 포인트:
+운영 관점에서 이렇게 짚어 준다.
 
 - `NoRegionError`는 코드 문제가 아니라 region 설정 문제다.
 - `AccessDenied`나 model access 오류는 IAM 또는 Bedrock console의 model access 설정 문제일 가능성이 높다.
-- Bedrock은 boto3를 사용하므로 `LOGFIRE_CAPTURE_HTTPX=1`이 provider HTTP payload까지 모두 보여준다고 기대하면 안 된다. Pydantic AI agent/model/tool span은 관측하되, AWS SDK 레벨 진단은 CloudTrail, Bedrock 로그, boto3 설정과 함께 봐야 한다.
-- 모델 id는 region과 계정 설정에 따라 달라질 수 있다. 수업 직전 Bedrock 콘솔에서 실제 사용 가능한 model id를 확인한다.
+- Bedrock은 boto3를 쓰므로, `LOGFIRE_CAPTURE_HTTPX=1`이 provider HTTP payload까지 다 보여 줄 거라 기대하면 안 된다. Pydantic AI agent/model/tool span은 관측되지만, AWS SDK 레벨 진단은 CloudTrail, Bedrock 로그, boto3 설정과 함께 봐야 한다.
+- 모델 id는 region과 계정 설정에 따라 달라질 수 있다. 수업 직전에 Bedrock 콘솔에서 실제 쓸 수 있는 model id를 확인한다.
 
 ## Logfire와 provider 전환
 
-0회차에서 Logfire를 같이 켜는 이유는 provider 전환을 감으로 하지 않기 위해서다.
+0회차에서 Logfire를 같이 켜는 이유는, provider 전환을 감으로 하지 않으려는 데 있다.
 
 ```python
 import logfire
@@ -542,7 +542,7 @@ provider smoke test에서 확인할 것:
 - token usage가 수집되는가?
 - 동일 prompt를 provider별로 실행했을 때 latency와 usage가 어떻게 다른가?
 
-`LOGFIRE_CAPTURE_HTTPX=1`은 HTTPX 기반 provider의 payload 디버깅에 도움이 될 수 있지만, prompt와 사용자 데이터가 로그에 남을 수 있다. 수업에서는 민감한 데이터가 없는 smoke test에서만 켜고, 운영 기본값으로 쓰지 않는다.
+`LOGFIRE_CAPTURE_HTTPX=1`은 HTTPX 기반 provider의 payload 디버깅에 도움이 될 수 있다. 다만 prompt와 사용자 데이터가 로그에 남을 수 있으니, 수업에서는 민감한 데이터가 없는 smoke test에서만 켜고 운영 기본값으로는 쓰지 않는다.
 
 ## 흔한 실패와 디버깅
 
@@ -601,7 +601,7 @@ COURSE_MODEL=google:gemini-3-pro-preview \
 
 ## 1회차와의 연결
 
-0회차가 끝나면 1회차에서는 provider 설정을 다시 길게 설명하지 않는다. 1회차의 목표는 `Agent`, Logfire, tool, deps, structured output이다. 수강생은 이미 자신의 `.env`에 `COURSE_MODEL`을 정해 두고, 다음 파일을 실행할 수 있어야 한다.
+0회차가 끝나면 1회차에서는 provider 설정을 다시 길게 다루지 않는다. 1회차의 목표는 `Agent`, Logfire, tool, deps, structured output이다. 수강생은 이미 자신의 `.env`에 `COURSE_MODEL`을 정해 두고, 다음 파일을 실행할 수 있어야 한다.
 
 ```bash
 uv run python examples/01_basics/hello_agent.py
@@ -609,9 +609,9 @@ uv run python examples/01_basics/logfire_agent.py
 uv run python examples/01_basics/tool_agent.py
 ```
 
-강사는 1회차 초반에 이렇게만 확인한다.
+강사는 1회차 초반에 이것만 확인한다.
 
-"어제 0회차에서 smoke test가 통과한 모델 문자열을 그대로 씁니다. 오늘부터는 provider가 아니라 agent 경계에 집중합니다."
+"어제 0회차에서 smoke test 통과한 모델 문자열, 그대로 씁니다. 오늘부터는 provider 말고 agent 경계에 집중할 거예요."
 
 ## 미니 리뷰 질문
 

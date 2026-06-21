@@ -14,13 +14,13 @@
 
 ## Durable Execution
 
-retry는 다시 시도한다.
+retry는 처음부터 다시 시도한다.
 
-durable execution은 진행 상태를 저장하고 이어서 실행한다.
+durable execution은 진행 상태를 저장해 두고 멈춘 지점부터 이어서 실행한다.
 
-Human approval은 HTTP request보다 오래 걸릴 수 있다.
+Human approval은 HTTP request 하나보다 오래 걸릴 수 있다.
 
-Retry는 비용과 side effect를 늘릴 수 있다.
+Retry는 비용과 side effect를 키울 수 있다.
 
 ## DBOS
 
@@ -32,9 +32,9 @@ Retry는 비용과 side effect를 늘릴 수 있다.
 
 GraphBuilder는 흐름을 표현한다.
 
-영구 저장/복구는 durable execution과 앱 checkpoint로 설계한다.
+영구 저장과 복구는 durable execution과 앱 checkpoint로 설계한다.
 
-저장할 최소값:
+최소한 저장할 값:
 
 - `run_id`
 - `state_json`
@@ -53,7 +53,7 @@ uv run python examples/05_chatbot/dbos_graph_resume.py --run-id demo-graph --res
 - DBOS step retry: durable step 재실행
 - UI retry: 사용자의 재클릭/재전송
 
-retry owner를 정한다.
+retry는 누가 책임질지 owner를 정한다.
 
 provider 3회 * DBOS 3회 = 최대 9회
 
@@ -141,4 +141,4 @@ Backend:
 
 Agent -> RAG -> sandbox -> eval/graph -> multi-agent -> HITL -> durable execution -> chatbot
 
-각 기능은 "멋있어서"가 아니라 특정 운영 문제를 해결하기 위해 도입한다.
+어느 기능도 멋있어서 넣은 게 아니라, 저마다 특정 운영 문제를 풀려고 가져온 것이다.

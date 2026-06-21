@@ -8,9 +8,9 @@
 
 ## 문제
 
-여러 tool 호출은 느리고 비싸다.
+tool을 여러 번 호출하면 느리고 비싸다.
 
-LLM이 생성한 코드를 host Python에서 직접 실행하는 것은 위험하다.
+LLM이 생성한 코드를 host Python에서 그대로 실행하는 건 위험하다.
 
 ## CodeMode
 

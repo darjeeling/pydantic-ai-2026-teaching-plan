@@ -51,7 +51,7 @@ async def retrieve(ctx: RunContext[Deps], query: str) -> str:
 
 ## Data-Centric RAG
 
-좋은 모델도 나쁜 문서를 검색하면 나쁜 답을 만든다.
+아무리 좋은 모델도 검색된 문서가 나쁘면 나쁜 답을 낸다.
 
 - 최신성
 - 중복 문서
@@ -74,7 +74,7 @@ Vector RAG는 가까운 chunk를 찾는다.
 
 GraphRAG는 entity와 relation을 따라간다.
 
-처음부터 GraphRAG로 시작하지 않는다. 관계 기반 질문에서 Vector RAG가 반복적으로 실패할 때 검토한다.
+처음부터 GraphRAG로 가지는 않는다. 관계를 묻는 질문에서 Vector RAG가 자꾸 실패할 때 검토한다.
 
 ## 실무 질문
 

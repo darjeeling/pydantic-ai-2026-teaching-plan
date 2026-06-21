@@ -33,7 +33,7 @@ Dataset(
 
 ## RAG Eval
 
-답변만 보면 늦다.
+답변만 보고 판단하면 이미 늦다.
 
 - Retrieval: 기대 source가 top-k에 있는가?
 - Answer: 근거와 일치하는가?
@@ -53,7 +53,7 @@ Dataset(
 - 분기와 재시도가 많다.
 - 시각화와 replay가 필요하다.
 
-Graph는 기본 선택지가 아니다.
+Graph는 처음부터 꺼낼 선택지가 아니다.
 
 ## Multi-agent 패턴
 
