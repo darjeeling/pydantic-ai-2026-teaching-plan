@@ -68,6 +68,20 @@ Docker가 어려운 환경이면 강사는 `schema.sql`, `load_docs.py`, `rag_ag
 
 OpenAI embedding API를 쓰기 어려운 환경이면 Ollama나 SentenceTransformers 기반 로컬 embedding으로 대체할 수 있다. 이때도 답변 생성 agent는 기본적으로 `COURSE_MODEL`을 쓰므로, "embedding만 로컬"인지 "답변 모델까지 로컬"인지 구분해서 설명한다. 이 수업의 예제는 embedding provider만 바꿔 끼우는 구조다.
 
+이 회차 예제가 읽는 환경변수를 한곳에 정리하면 다음과 같다. 기본값만으로도 OpenAI + docker compose 조합은 그대로 돌아가고, 로컬 embedding을 쓸 때만 아래 변수를 손대면 된다.
+
+| 변수 | 용도 | 기본값/비고 |
+| --- | --- | --- |
+| `COURSE_MODEL` (또는 `OPENAI_MODEL`) | 답변 생성 모델 | 기본 `openai:gpt-5.5` |
+| `OPENAI_API_KEY` | OpenAI 답변/embedding 호출 | OpenAI를 쓸 때 필수 |
+| `POSTGRES_DSN` | pgvector 연결 | 기본 `postgresql://postgres:postgres@localhost:54320/pydantic_ai_course` |
+| `EMBEDDING_PROVIDER` | embedding 제공자 | `openai`(기본) / `ollama` / `sentence-transformers` |
+| `EMBEDDING_MODEL` | embedding 모델 이름 | provider별 기본값 사용(비우면 자동) |
+| `EMBEDDING_DIMENSIONS` | vector 차원 | 비우면 probe로 추론, 운영에서는 고정 권장 |
+| `OLLAMA_BASE_URL` | Ollama 주소 | 기본 `http://127.0.0.1:11434` |
+| `SENTENCE_TRANSFORMERS_DEVICE` | 로컬 임베딩 디바이스 | `cpu` / `cuda` / `mps` 등 |
+| `RESET_RAG_TABLE` | 재적재 시 테이블 초기화 | `1`이면 `doc_chunks`를 DROP 후 재생성 |
+
 ## 120분 진행안
 
 | 시간 | 내용 | 강사 목표 | 수강생 활동 |

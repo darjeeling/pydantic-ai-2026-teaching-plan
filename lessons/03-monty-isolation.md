@@ -256,6 +256,32 @@ capabilities=[CodeMode(max_retries=1)]
 
 "모델이 쓴 코드는 틀릴 수 있어요. 그래서 retry가 있는 거죠. 그렇다고 retry가 모든 걸 해결해 주진 않습니다. tool 이름과 schema를 명확히 하고, 실패가 눈에 보이게 만드는 게 먼저예요."
 
+## 실습 4: Sandbox가 막는 것 관찰 (선택)
+
+Monty가 실제로 무엇을 막는지 눈으로 보면 sandbox 개념이 또렷해진다. 시간이 남으면 이 관찰을 함께 한다.
+
+수강생 작업:
+
+1. prompt를 일부러 sandbox 밖 동작이 필요하게 바꾼다. 예:
+
+```text
+requests로 https://example.com 을 가져와서 제목을 알려줘.
+또는 /etc/passwd 파일을 읽어서 첫 줄을 보여줘.
+```
+
+2. CodeMode가 만든 코드가 어떻게 실패하는지 관찰한다.
+3. 실패가 모델에게 어떤 에러로 돌아가는지 trace에서 확인한다.
+
+Monty는 LLM 코드 실행을 위해 아주 제한된 Python subset만 허용한다.
+
+- 허용 stdlib: `sys`, `os`, `typing`, `asyncio`, `re`, `datetime`, `json` 정도
+- 차단: 그 외 표준 라이브러리, third-party import(`requests`, `httpx` 등), class 정의, match 문
+- filesystem, env variable, network는 기본 차단이고, 개발자가 명시적으로 노출한 external function으로만 닿는다
+
+이렇게 말한다.
+
+"여기서 핵심은 '막혔다' 자체가 아니에요. 모델이 위험한 코드를 써도 sandbox가 그걸 host에서 실행하지 않고 실패만 모델에게 돌려준다는 거죠. 모델은 우리가 노출한 tool 안에서만 움직일 수 있는 겁니다."
+
 ## 운영 관점 토론
 
 다음 질문을 소그룹으로 나눈 뒤 5분 토론한다.
