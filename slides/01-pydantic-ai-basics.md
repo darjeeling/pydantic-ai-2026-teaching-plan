@@ -7,6 +7,15 @@
 - tool을 호출하는 agent
 - deps와 structured output을 가진 agent
 
+## 에이전트란?
+
+"LLM 에이전트는 목표를 이루기 위해 tool을 loop로 호출한다." (Simon Willison, 2025)
+
+- tool을 loop로: 모델이 tool 요청 → harness 실행 → 결과를 모델에 전달 → 반복
+- 목표를 이루기 위해: 무한 루프가 아니라 멈추는 조건이 있다
+- 농담 버전: "LLM이 loop를 돌며 자기 환경을 부수는 것" → 강력함과 위험이 한 몸 (3회차 sandbox)
+- Pydantic AI의 `Agent` = 이 loop에 타입과 검증을 입힌 것
+
 ## 왜 Pydantic AI인가
 
 - Python type hint와 Pydantic validation을 agent 경계에 사용

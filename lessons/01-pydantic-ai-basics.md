@@ -115,6 +115,33 @@ typed application result
 
 ## 개념 설명 스크립트
 
+### 에이전트란 무엇인가
+
+`Agent` 객체를 보기 전에, "agent"라는 말부터 정리하고 간다. 이 단어는 오랫동안 사람마다 다른 뜻으로 써서 모호했다. 2025년에 Simon Willison이 정리해 널리 받아들여진 정의가 출발점으로 좋다.
+
+"LLM 에이전트는 목표를 이루기 위해 tool을 loop로 호출한다." (An LLM agent runs tools in a loop to achieve a goal.)
+
+이 한 문장을 쪼개 본다.
+
+- tool을 loop로: 모델이 "이 tool을 이런 인자로 부르고 싶다"고 요청하면 harness가 실제로 실행하고, 그 결과를 다시 모델에게 넣어 준다. 모델은 그걸 보고 다음 행동을 정한다. 이 주고받기가 loop다. Anthropic이 정리한 "tools in a loop" 프레이밍과 같다.
+- 목표를 이루기 위해: 무한 루프가 아니라 멈추는 조건이 있다. 목표를 이루거나 더 할 게 없으면 끝낸다.
+- 메모리는? loop가 대화로 쌓이니 단기 기억은 이미 들어 있다. 장기 기억이 필요하면 보통 그것도 tool로 붙인다.
+
+같은 맥락에서 Simon Willison은 농담 섞인 정의도 소개한다.
+
+"에이전트는 LLM이 loop를 돌며 자기 환경을 부수는 것이다." (An agent is an LLM wrecking its environment in a loop.)
+
+이건 "tool을 loop로 호출한다"는 현대적 정의에, "어떤 주체가 환경 안에서 행동해 영향을 만든다"는 고전적 agent 개념을 겹쳐 놓은 말이다. 그러면서 핵심 위험도 같이 짚는다. loop를 돌며 tool을 부르는 능력은 강력한 만큼, 그 tool이 위험하면 환경을 망가뜨릴 수도 있다. 이 위험은 3회차 Monty/sandbox에서 본격적으로 다룬다.
+
+이렇게 말한다.
+
+"agent는 마법이 아니에요. 모델이 tool을 부르고, 그 결과를 받아 다음을 정하는 loop일 뿐입니다. 이 수업에서 배우는 Pydantic AI의 `Agent`는 바로 이 loop에 타입과 검증을 입힌 거예요. 그래서 바로 다음에 `Agent` 객체부터 봅니다."
+
+참고 자료:
+
+- Simon Willison, "I think 'agent' may finally have a widely enough agreed upon definition to be useful jargon now" (2025): https://simonw.substack.com/p/i-think-agent-may-finally-have-a
+- Simon Willison, "An agent is an LLM wrecking its environment in a loop" (2025): https://simonwillison.net/2025/Jun/5/wrecking-its-environment-in-a-loop/
+
 ### Agent
 
 `Agent`는 모델 이름과 실행 정책을 들고 있는 객체다. 겉보기엔 함수 하나 같지만, 안에서는 모델 요청부터 tool 정의와 실행, output 검증, usage 집계까지 다 챙긴다.

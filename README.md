@@ -183,3 +183,5 @@ EMBEDDING_PROVIDER=ollama EMBEDDING_MODEL=embeddinggemma EMBEDDING_DIMENSIONS= R
 - HTTP request retries: https://pydantic.dev/docs/ai/retries/
 - Monty: https://github.com/pydantic/monty
 - Pydantic AI Harness: https://github.com/pydantic/pydantic-ai-harness
+- "Agent" 정의 (Simon Willison, 2025): https://simonw.substack.com/p/i-think-agent-may-finally-have-a
+- "An agent is an LLM wrecking its environment in a loop" (Simon Willison, 2025): https://simonwillison.net/2025/Jun/5/wrecking-its-environment-in-a-loop/
